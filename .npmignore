@@ -15,3 +15,9 @@ docs
 # Locale dependencies
 node_modules
 
+# Vagrant configuration and Puppet modules
+Vagrantfile
+puppet
+
+# Vagrant cache
+.vagrant

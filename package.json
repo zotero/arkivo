@@ -1,0 +1,33 @@
+{
+  "name": "arkivo",
+  "version": "0.0.0",
+  "description": "Zotero Archiving Tool",
+  "main": "lib/arkivo.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/inukshuk/arkivo.git"
+  },
+  "keywords": [
+    "zotero"
+  ],
+  "author": "Sylvester Keil",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/inukshuk/arkivo/issues"
+  },
+  "homepage": "https://github.com/inukshuk/arkivo",
+  "dependencies": {
+    "debug": "^1.0.3",
+    "kue": "^0.8.2",
+    "zotero": "~0.0.2"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "eslint": "^0.7.4",
+    "istanbul": "^0.3.0",
+    "mocha": "^1.20.1"
+  }
+}

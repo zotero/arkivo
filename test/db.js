@@ -1,6 +1,6 @@
 /*globals
   describe: true it: true after: true before: true
-  beforeEach: true afterEach: true */ 
+  beforeEach: true afterEach: true */
 
 var chai = require('chai');
 var expect = chai.expect;
@@ -12,12 +12,14 @@ chai.use(require('sinon-chai'));
 var Database = require('../lib/db');
 
 describe('Database', function () {
+  function noop() {}
 
   before(function () {
     sinon.stub(redis, 'createClient', function () {
-      var proxy = { sadd: function () {} };
+      var proxy = { sadd: noop, del: noop };
 
       sinon.stub(proxy, 'sadd');
+      sinon.stub(proxy, 'del');
 
       return proxy;
     });
@@ -47,7 +49,7 @@ describe('Database', function () {
     });
   });
 
-  describe('proxy -1- methods', function () {
+  describe('proxy +1 methods', function () {
     var db;
 
     beforeEach(function () { db = new Database('ns'); });
@@ -64,6 +66,26 @@ describe('Database', function () {
     it('pass on the remaining arguments as is', function () {
       db.sadd('foo', 'bar', 'baz');
       expect(db.client.sadd).to.have.been.calledWith('ns:foo', 'bar', 'baz');
+    });
+  });
+
+  describe('proxy -1 methods', function () {
+    var db;
+
+    beforeEach(function () { db = new Database('ns'); });
+
+    it('namespace the first argument', function () {
+      db.del('foo');
+      expect(db.client.del).to.have.been.calledWith('ns:foo');
+    });
+
+    it('do not fail if less than one argument is given', function () {
+      expect(function () { db.del(); }).to.not.throw(Error);
+    });
+
+    it('namespace all arguments', function () {
+      db.del('foo', 'bar', 'baz');
+      expect(db.client.del).to.have.been.calledWith('ns:foo', 'ns:bar', 'ns:baz');
     });
   });
 });

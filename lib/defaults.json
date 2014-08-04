@@ -3,8 +3,8 @@
     "prefix": "q"
   },
 
-  "archive": {
-    "prefix": "a"
+  "subscription": {
+    "prefix": "s"
   },
 
   "sync": {

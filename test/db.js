@@ -9,9 +9,9 @@ var redis = require('redis');
 
 chai.use(require('sinon-chai'));
 
-var Database = require('../lib/db');
+var db = require('../lib/db');
 
-describe('Database', function () {
+describe('db', function () {
   function noop() {}
 
   before(function () {
@@ -29,73 +29,73 @@ describe('Database', function () {
     redis.createClient.restore();
   });
 
-  it('is a function constructor', function () {
-    expect(Database).to.be.a('function');
+  it('is a function', function () {
+    expect(db).to.be.a('function');
   });
 
   describe('constructor', function () {
 
     it('creates a redis proxy using the passed-in name', function () {
-      expect((new Database('ns')).name).to.equal('ns');
+      expect(db('ns').name).to.equal('ns');
     });
 
     it('calls redis.createClient with default options', function () {
       redis.createClient.reset();
       expect(redis.createClient).to.not.have.been.called;
 
-      new Database('foo');
+      db('foo');
 
       expect(redis.createClient).to.have.been.called;
     });
   });
 
   describe('proxy +1 methods', function () {
-    var db;
+    var database;
 
-    beforeEach(function () { db = new Database('ns'); });
+    beforeEach(function () { database = db('ns'); });
 
     it('namespace the first argument', function () {
-      db.sadd('foo');
-      expect(db.client.sadd).to.have.been.calledWith('ns:foo');
+      database.sadd('foo');
+      expect(database.client.sadd).to.have.been.calledWith('ns:foo');
     });
 
     it('fail if less than one argument is given', function () {
-      expect(function () { db.sadd(); }).to.throw(Error);
+      expect(function () { database.sadd(); }).to.throw(Error);
     });
 
     it('pass on the remaining arguments as is', function () {
-      db.sadd('foo', 'bar', 'baz');
-      expect(db.client.sadd).to.have.been.calledWith('ns:foo', 'bar', 'baz');
+      database.sadd('foo', 'bar', 'baz');
+      expect(database.client.sadd).to.have.been.calledWith('ns:foo', 'bar', 'baz');
     });
 
     it('does not mess with the callback', function () {
-      db.sadd('foo', noop);
-      expect(db.client.sadd).to.have.been.calledWith('ns:foo', noop);
+      database.sadd('foo', noop);
+      expect(database.client.sadd).to.have.been.calledWith('ns:foo', noop);
     });
   });
 
   describe('proxy -1 methods', function () {
-    var db;
+    var database;
 
-    beforeEach(function () { db = new Database('ns'); });
+    beforeEach(function () { database = db('ns'); });
 
     it('namespace the first argument', function () {
-      db.del('foo');
-      expect(db.client.del).to.have.been.calledWith('ns:foo');
+      database.del('foo');
+      expect(database.client.del).to.have.been.calledWith('ns:foo');
     });
 
     it('do not fail if less than one argument is given', function () {
-      expect(function () { db.del(); }).to.not.throw(Error);
+      expect(function () { database.del(); }).to.not.throw(Error);
     });
 
     it('namespace all arguments', function () {
-      db.del('foo', 'bar', 'baz');
-      expect(db.client.del).to.have.been.calledWith('ns:foo', 'ns:bar', 'ns:baz');
+      database.del('foo', 'bar', 'baz');
+      expect(database.client.del).to.have.been.calledWith('ns:foo', 'ns:bar', 'ns:baz');
     });
 
     it('does not mess with the callback', function () {
-      db.del('foo', noop);
-      expect(db.client.del).to.have.been.calledWith('ns:foo', noop);
+      database.del('foo', noop);
+      expect(database.client.del).to.have.been.calledWith('ns:foo', noop);
     });
   });
 });

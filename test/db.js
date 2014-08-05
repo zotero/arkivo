@@ -1,6 +1,4 @@
-/*globals
-  describe: true it: true after: true before: true
-  beforeEach: true afterEach: true */
+/*globals describe: true, it: true, after: true, before: true, beforeEach: true */
 
 var chai = require('chai');
 var expect = chai.expect;
@@ -16,8 +14,9 @@ describe('db', function () {
 
   before(function () {
     sinon.stub(redis, 'createClient', function () {
-      var proxy = { saddAsync: noop, delAsync: noop };
+      var proxy = { on: noop, saddAsync: noop, delAsync: noop };
 
+      sinon.stub(proxy, 'on');
       sinon.stub(proxy, 'saddAsync');
       sinon.stub(proxy, 'delAsync');
 

@@ -1,5 +1,4 @@
 BIN = ./node_modules/.bin
-ISTANBUL = ./node_modules/.bin/istanbul
 
 SRC = lib/*.js
 TEST = test/*.js
@@ -10,26 +9,25 @@ doc:
 lint:
 	@${BIN}/eslint --reset --eslintrc ${SRC}
 
-test: lint
-	@${BIN}/mocha ${TEST}
+test:
+	@${BIN}/mocha --harmony-generators ${TEST}
 
 debug:
-	@${BIN}/mocha debug ${TEST}
+	@${BIN}/mocha debug --harmony-generators ${TEST}
 
 test-travis:
-	${BIN}/istanbul cover ${BIN}/_mocha --report-lcovonly -- ${TEST}
+	@node --harmony-generators \
+		${BIN}/istanbul cover ${BIN}/_mocha --report-lcovonly -- ${TEST}
 
 spec:
-	@${BIN}/mocha --reporter spec ${TEST}
+	@${BIN}/mocha --harmony-generators --reporter spec ${TEST}
 
 coverage: clean
-	${BIN}/istanbul cover ${BIN}/_mocha -- ${TEST}
-
-watch:
-	@DEBUG=zotero:watch ./watch.js
+	@node --harmony-generators \
+		${BIN}/istanbul cover ${BIN}/_mocha -- ${TEST}
 
 clean:
-	rm -rf ./coverage
-	rm -rf ./doc
+	@rm -rf ./coverage
+	@rm -rf ./doc
 
 .PHONY: lint doc clean test debug test-travis spec watch coverage

@@ -16,10 +16,10 @@ describe('db', function () {
 
   before(function () {
     sinon.stub(redis, 'createClient', function () {
-      var proxy = { sadd: noop, del: noop };
+      var proxy = { saddAsync: noop, delAsync: noop };
 
-      sinon.stub(proxy, 'sadd');
-      sinon.stub(proxy, 'del');
+      sinon.stub(proxy, 'saddAsync');
+      sinon.stub(proxy, 'delAsync');
 
       return proxy;
     });
@@ -56,7 +56,7 @@ describe('db', function () {
 
     it('namespace the first argument', function () {
       database.sadd('foo');
-      expect(database.client.sadd).to.have.been.calledWith('ns:foo');
+      expect(database.client.saddAsync).to.have.been.calledWith('ns:foo');
     });
 
     it('fail if less than one argument is given', function () {
@@ -65,12 +65,12 @@ describe('db', function () {
 
     it('pass on the remaining arguments as is', function () {
       database.sadd('foo', 'bar', 'baz');
-      expect(database.client.sadd).to.have.been.calledWith('ns:foo', 'bar', 'baz');
+      expect(database.client.saddAsync).to.have.been.calledWith('ns:foo', 'bar', 'baz');
     });
 
     it('does not mess with the callback', function () {
       database.sadd('foo', noop);
-      expect(database.client.sadd).to.have.been.calledWith('ns:foo', noop);
+      expect(database.client.saddAsync).to.have.been.calledWith('ns:foo', noop);
     });
   });
 
@@ -81,7 +81,7 @@ describe('db', function () {
 
     it('namespace the first argument', function () {
       database.del('foo');
-      expect(database.client.del).to.have.been.calledWith('ns:foo');
+      expect(database.client.delAsync).to.have.been.calledWith('ns:foo');
     });
 
     it('do not fail if less than one argument is given', function () {
@@ -90,12 +90,12 @@ describe('db', function () {
 
     it('namespace all arguments', function () {
       database.del('foo', 'bar', 'baz');
-      expect(database.client.del).to.have.been.calledWith('ns:foo', 'ns:bar', 'ns:baz');
+      expect(database.client.delAsync).to.have.been.calledWith('ns:foo', 'ns:bar', 'ns:baz');
     });
 
     it('does not mess with the callback', function () {
       database.del('foo', noop);
-      expect(database.client.del).to.have.been.calledWith('ns:foo', noop);
+      expect(database.client.delAsync).to.have.been.calledWith('ns:foo', noop);
     });
   });
 });

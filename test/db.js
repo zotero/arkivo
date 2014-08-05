@@ -67,6 +67,11 @@ describe('Database', function () {
       db.sadd('foo', 'bar', 'baz');
       expect(db.client.sadd).to.have.been.calledWith('ns:foo', 'bar', 'baz');
     });
+
+    it('does not mess with the callback', function () {
+      db.sadd('foo', noop);
+      expect(db.client.sadd).to.have.been.calledWith('ns:foo', noop);
+    });
   });
 
   describe('proxy -1 methods', function () {
@@ -86,6 +91,11 @@ describe('Database', function () {
     it('namespace all arguments', function () {
       db.del('foo', 'bar', 'baz');
       expect(db.client.del).to.have.been.calledWith('ns:foo', 'ns:bar', 'ns:baz');
+    });
+
+    it('does not mess with the callback', function () {
+      db.del('foo', noop);
+      expect(db.client.del).to.have.been.calledWith('ns:foo', noop);
     });
   });
 });

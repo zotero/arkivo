@@ -6,16 +6,18 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-try {
-  var s = new Subscription(process.argv[2], process.argv[3]);
+(new Subscription(process.argv.slice(2, 4)))
 
-  s.save();
+  .save()
 
-  console.log('Subscription for URL %s saved', s.id);
+  .then(function (s) {
+    console.log('Subscription for URL %s saved', s.id);
+  })
 
-} catch (error) {
-  console.log('Subscription failed: %s', error.message);
-
-} finally {
-  Subscription.quit();
-}
+  .catch(function (e) {
+    console.log('Subscription failed: %s', e.message);
+  })
+    
+  .finally(function () {
+    Subscription.disconnect();
+  });

@@ -31,4 +31,20 @@ describe('common', function () {
       expect(common.unzip(['a'])).to.eql([['a'], [undefined]]);
     });
   });
+
+  describe('.flatten', function () {
+    it('returns the arguments to an array', function () {
+      expect(common.flatten()).to.eql([]);
+      expect(common.flatten([])).to.eql([]);
+
+      expect(common.flatten(0)).to.eql([0]);
+      expect(common.flatten([0])).to.eql([0]);
+
+      expect(common.flatten(0, 1)).to.eql([0, 1]);
+      expect(common.flatten([0, 1])).to.eql([0, 1]);
+
+      expect(common.flatten([0, 1], 2)).to.eql([0, 1, 2]);
+      expect(common.flatten(0, [1])).to.eql([0, 1]);
+    });
+  });
 });

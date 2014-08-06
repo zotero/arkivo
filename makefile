@@ -7,9 +7,9 @@ doc:
 	${BIN}/yuidoc .
 
 lint:
-	@${BIN}/eslint --reset --eslintrc ${SRC}
+	@${BIN}/jshint --verbose ${SRC} ${TEST}
 
-test:
+test: lint
 	@${BIN}/mocha --harmony-generators ${TEST}
 
 debug:

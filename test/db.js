@@ -1,5 +1,3 @@
-/*globals describe: true, it: true, after: true, before: true, beforeEach: true */
-
 var chai = require('chai');
 var expect = chai.expect;
 var sinon = require('sinon');
@@ -64,7 +62,8 @@ describe('db', function () {
 
     it('pass on the remaining arguments as is', function () {
       database.sadd('foo', 'bar', 'baz');
-      expect(database.client.saddAsync).to.have.been.calledWith('ns:foo', 'bar', 'baz');
+      expect(database.client.saddAsync)
+        .to.have.been.calledWith('ns:foo', 'bar', 'baz');
     });
 
     it('does not mess with the callback', function () {
@@ -89,7 +88,9 @@ describe('db', function () {
 
     it('namespace all arguments', function () {
       database.del('foo', 'bar', 'baz');
-      expect(database.client.delAsync).to.have.been.calledWith('ns:foo', 'ns:bar', 'ns:baz');
+
+      expect(database.client.delAsync)
+        .to.have.been.calledWith('ns:foo', 'ns:bar', 'ns:baz');
     });
 
     it('does not mess with the callback', function () {

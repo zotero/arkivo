@@ -22,4 +22,23 @@ describe('Subscription', function () {
       expect(new Subscription({ id: 'y' })).to.have.property('id', 'y');
     });
   });
+
+  describe('#version', function () {
+    it('is zero by default', function () {
+      expect((new Subscription()).version).to.equal(0);
+    });
+
+    it('is stored as an integer', function () {
+      var s = new Subscription();
+
+      s.version = 3;
+      expect(s.version).to.equal(3);
+
+      s.version = '42';
+      expect(s.version).to.equal(42);
+
+      s.version = 'foo';
+      expect(s.version).to.equal(0);
+    });
+  });
 });

@@ -12,13 +12,7 @@ describe('db', function () {
 
   before(function () {
     sinon.stub(redis, 'createClient', function () {
-      var proxy = { on: noop, saddAsync: noop, delAsync: noop };
-
-      sinon.stub(proxy, 'on');
-      sinon.stub(proxy, 'saddAsync');
-      sinon.stub(proxy, 'delAsync');
-
-      return proxy;
+      return { on: sinon.spy(), saddAsync: sinon.spy(), delAsync: sinon.spy() };
     });
   });
 
@@ -31,6 +25,13 @@ describe('db', function () {
   });
 
   describe('constructor', function () {
+
+    it('returns a new Database Proxy', function () {
+      var database = db('foo');
+
+      expect(database).to.be.instanceof(db.Database);
+      expect(database).to.be.instanceof(db.Proxy);
+    });
 
     it('creates a redis proxy using the passed-in name', function () {
       expect(db('ns').name).to.equal('ns');
@@ -98,4 +99,78 @@ describe('db', function () {
       expect(database.client.delAsync).to.have.been.calledWith('ns:foo', noop);
     });
   });
+
+  describe('.transaction', function () {
+    var database;
+
+    beforeEach(function () {
+      database = db('ns');
+
+      database.client.multi = sinon.spy(function () {
+        return {
+          execAsync: sinon.spy(function () { return 'exec'; }),
+          saddAsync: sinon.spy(function () { return this; })
+        };
+      });
+    });
+
+    it('returns a new transaction', function () {
+      expect(database.transaction()).to.be.instanceof(db.Transaction);
+    });
+
+    it('calls MULTI on the redis client', function () {
+      expect(database.client.multi).to.not.have.been.called;
+      database.transaction();
+      expect(database.client.multi).to.have.been.called;
+    });
+
+    describe('proxy +1 methods', function () {
+      var transaction;
+
+      beforeEach(function () { transaction = database.transaction(); });
+
+      it('are forwarded to the multi object', function () {
+        expect(transaction.multi.saddAsync).to.not.have.been.called;
+        transaction.sadd('foo');
+        expect(transaction.multi.saddAsync).to.have.been.called;
+      });
+
+      it('namespace the first argument', function () {
+        transaction.sadd('foo', 'bar');
+
+        expect(transaction.multi.saddAsync)
+          .to.have.been.calledWith('ns:foo', 'bar');
+      });
+
+      it('can be chained if target returns itself', function () {
+        expect(transaction.sadd('foo')).to.be.equal(transaction);
+
+        transaction.sadd('bar').sadd('baz');
+
+        expect(transaction.multi.saddAsync).to.have.been.calledThrice;
+
+        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:foo');
+        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:bar');
+        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:baz');
+      });
+    });
+
+    describe('.commit', function () {
+      it('calls EXEC on the multi object', function () {
+        var transaction = database.transaction();
+
+        expect(
+          transaction.sadd('foo').sadd('bar').commit()
+        ).to.eql('exec');
+
+        expect(transaction.multi.saddAsync).to.have.been.calledTwice;
+
+        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:foo');
+        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:bar');
+
+        expect(transaction.multi.execAsync).to.have.been.calledOnce;
+      });
+    });
+  });
+
 });

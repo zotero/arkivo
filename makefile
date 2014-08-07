@@ -13,7 +13,7 @@ test: lint
 	@${BIN}/mocha --harmony-generators ${TEST}
 
 debug:
-	@${BIN}/mocha debug --harmony-generators ${TEST}
+	@${BIN}/mocha --harmony-generators debug ${TEST}
 
 test-travis:
 	@node --harmony-generators \

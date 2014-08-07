@@ -6,6 +6,7 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
+
 Subscription.register(process.argv.slice(2, 4))
 
   .then(function (s) {
@@ -14,8 +15,9 @@ Subscription.register(process.argv.slice(2, 4))
 
   .catch(function (e) {
     console.log('Subscription failed: %s', e.message);
+    console.error(e.stack);
   })
-    
+
   .finally(function () {
     Subscription.disconnect();
   });

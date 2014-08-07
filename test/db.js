@@ -109,7 +109,7 @@ describe('db', function () {
       database.client.multi = sinon.spy(function () {
         return {
           execAsync: sinon.spy(function () { return 'exec'; }),
-          saddAsync: sinon.spy(function () { return this; })
+          sadd: sinon.spy(function () { return this; })
         };
       });
     });
@@ -130,15 +130,15 @@ describe('db', function () {
       beforeEach(function () { transaction = database.transaction(); });
 
       it('are forwarded to the multi object', function () {
-        expect(transaction.multi.saddAsync).to.not.have.been.called;
+        expect(transaction.multi.sadd).to.not.have.been.called;
         transaction.sadd('foo');
-        expect(transaction.multi.saddAsync).to.have.been.called;
+        expect(transaction.multi.sadd).to.have.been.called;
       });
 
       it('namespace the first argument', function () {
         transaction.sadd('foo', 'bar');
 
-        expect(transaction.multi.saddAsync)
+        expect(transaction.multi.sadd)
           .to.have.been.calledWith('ns:foo', 'bar');
       });
 
@@ -147,11 +147,11 @@ describe('db', function () {
 
         transaction.sadd('bar').sadd('baz');
 
-        expect(transaction.multi.saddAsync).to.have.been.calledThrice;
+        expect(transaction.multi.sadd).to.have.been.calledThrice;
 
-        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:foo');
-        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:bar');
-        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:baz');
+        expect(transaction.multi.sadd).to.have.been.calledWith('ns:foo');
+        expect(transaction.multi.sadd).to.have.been.calledWith('ns:bar');
+        expect(transaction.multi.sadd).to.have.been.calledWith('ns:baz');
       });
     });
 
@@ -163,10 +163,10 @@ describe('db', function () {
           transaction.sadd('foo').sadd('bar').commit()
         ).to.eql('exec');
 
-        expect(transaction.multi.saddAsync).to.have.been.calledTwice;
+        expect(transaction.multi.sadd).to.have.been.calledTwice;
 
-        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:foo');
-        expect(transaction.multi.saddAsync).to.have.been.calledWith('ns:bar');
+        expect(transaction.multi.sadd).to.have.been.calledWith('ns:foo');
+        expect(transaction.multi.sadd).to.have.been.calledWith('ns:bar');
 
         expect(transaction.multi.execAsync).to.have.been.calledOnce;
       });

@@ -6,9 +6,7 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-(new Subscription(process.argv.slice(2, 4)))
-
-  .save()
+Subscription.register(process.argv.slice(2, 4))
 
   .then(function (s) {
     console.log('Subscription for URL %s saved', s.id);

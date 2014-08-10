@@ -41,4 +41,37 @@ describe('Subscription', function () {
       expect(s.version).to.equal(0);
     });
   });
+
+  describe('#url', function () {
+    var s;
+
+    beforeEach(function () { s = new Subscription(); });
+
+    it('is an empty string by default', function () {
+      expect(s.url).to.equal('');
+    });
+
+    it('is composed of pathname and params', function () {
+      expect(s.pathname).to.be.undefined;
+      expect(s.params).to.be.empty;
+
+      s.pathname = 'foo';
+      expect(s.url).to.equal('foo');
+
+      s.params.bar = 'baz';
+      expect(s.url).to.equal('foo?bar=baz');
+    });
+
+    it('sets pathname and params automatically', function () {
+      s.url = 'foo/bar?baz=true';
+
+      expect(s.pathname).to.equal('foo/bar');
+      expect(s.params).to.have.property('baz', 'true');
+
+      s = new Subscription({ url: 'tra/la/la?debug=false' });
+
+      expect(s.pathname).to.equal('tra/la/la');
+      expect(s.params).to.have.property('debug', 'false');
+    });
+  });
 });

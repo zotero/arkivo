@@ -47,4 +47,24 @@ describe('common', function () {
       expect(common.flatten(0, [1])).to.eql([0, 1]);
     });
   });
+
+  describe('.id', function () {
+    it('returns exactly N charactes', function () {
+      for (var i = 1; i < 16; ++i)
+        expect(common.id(i)).to.have.length(i);
+    });
+
+    it('returns 8 characters by default', function () {
+      expect(common.id()).to.have.length(8);
+    });
+
+    it('returns a pseudo-random string', function () {
+      var ids = {};
+
+      for (var i = 0; i < 16; ++i)
+        ids[common.id()] = true;
+
+      expect(Object.keys(ids).length).to.be.within(14, 16);
+    });
+  });
 });

@@ -52,7 +52,7 @@ describe('Subscription', function () {
     });
 
     it('is composed of pathname and params', function () {
-      expect(s.pathname).to.be.undefined;
+      expect(s.pathname).to.be.null;
       expect(s.params).to.be.empty;
 
       s.pathname = 'foo';

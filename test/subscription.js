@@ -104,12 +104,13 @@ describe('Subscription', function () {
     describe('for non-existing subscriptions', function () {
       beforeEach(function () {
         sinon.stub(Subscription.db, 'hgetall', function () {
-          return B.fullfilled({});
+          return B.fulfilled({});
         });
       });
 
       it('fails if the subscription does not exist', function () {
-        return expect(Subscription.load('foo')).to.eventually.be.rejected;
+        return expect(Subscription.load('foo'))
+          .to.eventually.be.rejectedWith(/not found/i);
       });
     });
   });

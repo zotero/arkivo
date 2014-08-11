@@ -217,10 +217,41 @@ describe('Subscription', function () {
   });
 
   describe('#identify', function () {
+    var COLLISIONS = 2;
+
+    beforeEach(function () {
+      var called = 0;
+
+      sinon.stub(Subscription.db, 'sismember', function () {
+        return B.fulfilled().then(function () {
+          return (called++ < COLLISIONS);
+        });
+      });
+    });
+
+    afterEach(function () {
+      Subscription.db.sismember.restore();
+    });
+
     it('returns a promise for the subscription with an id', function () {
+      var s = new Subscription();
+
+      expect(s).to.not.have.property('id');
+      return expect(s.identify()).eventually.to.equal(s)
+        .and.to.have.property('id').and.to.have.length(10);
     });
 
     it('sets a unique id', function () {
+      return (new Subscription()).identify().then(function () {
+        expect(Subscription.db.sismember.callCount).to.equal(COLLISIONS + 1);
+      });
+    });
+
+    it('does not change anything if subscription already has id', function () {
+      var s = new Subscription({ id: 'foo' });
+
+      return expect(s.identify()).eventually.to.equal(s)
+        .and.to.have.property('id', 'foo');
     });
   });
 });

@@ -255,4 +255,29 @@ describe('Subscription', function () {
         .and.to.have.property('id', 'foo');
     });
   });
+
+  describe('.all', function () {
+    beforeEach(function () {
+      sinon.stub(Subscription.db, 'smembers', function () {
+        return B.fulfilled(['foo', 'bar', 'baz']);
+      });
+
+      sinon.stub(Subscription, 'load', function () {
+        return B.fulfilled(new Subscription());
+      });
+    });
+
+    afterEach(function () {
+      Subscription.db.smembers.restore();
+      Subscription.load.restore();
+    });
+
+    it('loads all subscriptions', function () {
+      return Subscription.all().then(function (s) {
+        expect(s).to.have.length(3);
+        expect(s[0]).to.be.instanceof(Subscription);
+        expect(Subscription.load).to.have.been.calledTrice;
+      });
+    });
+  });
 });

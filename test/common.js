@@ -55,7 +55,7 @@ describe('common', function () {
     });
 
     it('returns 8 characters by default', function () {
-      expect(common.id()).to.have.length(8);
+      expect(common.id()).to.have.length(10);
     });
 
     it('returns a pseudo-random string', function () {
@@ -64,7 +64,7 @@ describe('common', function () {
       for (var i = 0; i < 16; ++i)
         ids[common.id()] = true;
 
-      expect(Object.keys(ids).length).to.be.within(14, 16);
+      expect(Object.keys(ids).length).to.be.within(15, 16);
     });
   });
 });

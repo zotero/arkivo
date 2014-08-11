@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "chai": "~1.9.1",
+    "chai-as-promised": "^4.1.1",
     "eslint": "~0.7.4",
     "istanbul-harmony": "^0.2.9",
     "jshint": "^2.5.2",

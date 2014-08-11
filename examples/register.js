@@ -7,10 +7,14 @@ if (process.argv.length < 3) {
 }
 
 
-Subscription.register(process.argv.slice(2, 4))
+Subscription
+  .register({
+    url: process.argv[2],
+    key: process.argv[3]
+  })
 
   .then(function (s) {
-    console.log('Subscription for URL %s saved', s.id);
+    console.log('Subscription saved as "%s"', s.id);
   })
 
   .catch(function (e) {

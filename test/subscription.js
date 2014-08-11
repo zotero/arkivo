@@ -114,45 +114,91 @@ describe('Subscription', function () {
     });
   });
 
+  describe('#values', function () {
+    it('returns the values for each key', function () {
+      var s = new Subscription();
+
+      expect(s.values).to.have.length(Subscription.keys.length);
+
+      s[Subscription.keys[0]] = 'foo';
+      expect(s.values[0]).to.eql('foo');
+    });
+  });
+
+  describe('#serialize', function () {
+    it('returns a zipped array of all keys and values', function () {
+      var s = (new Subscription()).serialize();
+
+      expect(s).to.be.an.instanceof(Array);
+      expect(s).to.have.length(Subscription.keys.length * 2);
+
+      expect(s[0]).to.equal(Subscription.keys[0]);
+      expect(s[1]).to.equal(s[Subscription.keys[0]]);
+    });
+  });
+
   describe('#save', function () {
+    var t;
+
     function chainspy() {
       return sinon.spy(function () { return this; });
     }
 
     beforeEach(function () {
+      t = {
+        sadd: chainspy(),
+        hmset: chainspy(),
+        commit: B.fulfilled.bind(B)
+      };
+
       sinon.stub(Subscription.db, 'transaction', function () {
-        return {
-          sadd: chainspy(),
-          hmset: chainspy(),
-          commit: B.fulfilled.bind(B)
-        };
+        return t;
+      });
+
+      sinon.stub(Subscription, 'exists', function () {
+        return B.fulfilled(false);
       });
     });
 
     afterEach(function () {
       Subscription.db.transaction.restore();
+      Subscription.exists.restore();
+    });
+
+    it('returns a promise for the saved subscription', function () {
+      var s = new Subscription({ url: 'foo' });
+
+      return expect(s.save())
+        .to.eventually.be.fulfilled
+        .and.equal(s)
+        .and.have.property('url', 'foo');
+    });
+
+    it('saves all keys', function () {
+      var s = new Subscription();
+
+      s.pathname = 'foo';
+      s.params.bar = 'baz';
+      s.key = '42';
+
+      return s.save()
+        .then(function () {
+          expect(t.hmset).to.have.been.calledOnce;
+
+          var call = t.hmset.getCall(0);
+
+          expect(call.args).to.have.length(2);
+          expect(call.args[1]).to.have.length(Subscription.keys.length * 2);
+          expect(call.args[0]).to.equal(call.args[1][1]);
+          expect(call.args[1].slice(2, 8)).to.eql([
+            'url', 'foo?bar=baz', 'key', '42', 'version', 0
+          ]);
+        });
     });
 
     describe('for new subscriptions', function () {
-      beforeEach(function () {
-        sinon.stub(Subscription, 'exists', function () {
-          return B.fulfilled(false);
-        });
-      });
-
-      afterEach(function () { Subscription.exists.restore(); });
-
-      it('returns a promise for the saved subscription', function () {
-        var s = new Subscription({ id: 'bar', url: 'foo' });
-
-        return expect(s.save())
-          .to.eventually.be.fulfilled
-          .and.equal(s)
-          .and.have.property('url', 'foo');
-      });
-
-      it('generates a new id if necessary', function () {
-        var s = new Subscription({ url: 'foo' });
+      it('generates a new id', function () {
+        var s = new Subscription({});
 
         return expect(s.save())
           .to.eventually.be.fulfilled
@@ -162,10 +208,10 @@ describe('Subscription', function () {
     });
 
     describe('for existing subscriptions', function () {
-      it('returns a promise for the saved subscription', function () {
-      });
-
       it('does not alter the id', function () {
+        return expect((new Subscription({ id: 'foo' })).save())
+          .to.eventually.be.fulfilled
+          .and.have.property('id', 'foo');
       });
     });
   });

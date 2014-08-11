@@ -277,6 +277,10 @@ describe('Subscription', function () {
         expect(s).to.have.length(3);
         expect(s[0]).to.be.instanceof(Subscription);
         expect(Subscription.load).to.have.been.calledTrice;
+
+        expect(Subscription.load).to.have.been.calledWith('foo');
+        expect(Subscription.load).to.have.been.calledWith('bar');
+        expect(Subscription.load).to.have.been.calledWith('baz');
       });
     });
   });

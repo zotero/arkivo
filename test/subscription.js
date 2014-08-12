@@ -32,7 +32,7 @@ describe('Subscription', function () {
   });
 
   describe('#touch', function () {
-    it('updates the timestamp', function () {
+    it('updates the timestamp', function (done) {
       var a, s = new Subscription();
 
       expect(s.timestamp).to.be.null;
@@ -42,8 +42,11 @@ describe('Subscription', function () {
 
       expect(a).to.be.a('string');
 
-      s.touch();
-      expect(a).to.be.below(s.timestamp);
+      // just to ensure some time elapsed!
+      setTimeout(function () {
+        expect(a).to.be.below(s.touch().timestamp);
+        done();
+      }, 15);
     });
   });
 

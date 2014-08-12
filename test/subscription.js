@@ -6,7 +6,10 @@ chai.use(require('chai-as-promised'));
 chai.use(require('sinon-chai'));
 
 var B = require('bluebird');
+
 var Subscription = require('../lib/subscription');
+var defaults = require('../lib/defaults');
+var db = require('../lib/db')(defaults.subscription.prefix);
 
 describe('Subscription', function () {
   it('is a constructor function', function () {
@@ -98,12 +101,12 @@ describe('Subscription', function () {
 
   describe('.load', function () {
     afterEach(function () {
-      Subscription.db.hgetall.restore();
+      db.hgetall.restore();
     });
 
     describe('for existing subscriptions', function () {
       beforeEach(function () {
-        sinon.stub(Subscription.db, 'hgetall', function () {
+        sinon.stub(db, 'hgetall', function () {
           return B.fulfilled({ id: 'foo', bar: 'baz' });
         });
       });
@@ -119,7 +122,7 @@ describe('Subscription', function () {
 
     describe('for non-existing subscriptions', function () {
       beforeEach(function () {
-        sinon.stub(Subscription.db, 'hgetall', function () {
+        sinon.stub(db, 'hgetall', function () {
           return B.fulfilled({});
         });
       });
@@ -168,7 +171,7 @@ describe('Subscription', function () {
         commit: B.fulfilled.bind(B)
       };
 
-      sinon.stub(Subscription.db, 'transaction', function () {
+      sinon.stub(db, 'transaction', function () {
         return t;
       });
 
@@ -178,7 +181,7 @@ describe('Subscription', function () {
     });
 
     afterEach(function () {
-      Subscription.db.transaction.restore();
+      db.transaction.restore();
       Subscription.exists.restore();
     });
 
@@ -240,7 +243,7 @@ describe('Subscription', function () {
     beforeEach(function () {
       var called = 0;
 
-      sinon.stub(Subscription.db, 'sismember', function () {
+      sinon.stub(db, 'sismember', function () {
         return B.fulfilled().then(function () {
           return (called++ < COLLISIONS);
         });
@@ -248,7 +251,7 @@ describe('Subscription', function () {
     });
 
     afterEach(function () {
-      Subscription.db.sismember.restore();
+      db.sismember.restore();
     });
 
     it('returns a promise for the subscription with an id', function () {
@@ -261,7 +264,7 @@ describe('Subscription', function () {
 
     it('sets a unique id', function () {
       return (new Subscription()).identify().then(function () {
-        expect(Subscription.db.sismember.callCount).to.equal(COLLISIONS + 1);
+        expect(db.sismember.callCount).to.equal(COLLISIONS + 1);
       });
     });
 
@@ -275,7 +278,7 @@ describe('Subscription', function () {
 
   describe('.all', function () {
     beforeEach(function () {
-      sinon.stub(Subscription.db, 'smembers', function () {
+      sinon.stub(db, 'smembers', function () {
         return B.fulfilled(['foo', 'bar', 'baz']);
       });
 
@@ -285,7 +288,7 @@ describe('Subscription', function () {
     });
 
     afterEach(function () {
-      Subscription.db.smembers.restore();
+      db.smembers.restore();
       Subscription.load.restore();
     });
 

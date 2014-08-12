@@ -37,12 +37,15 @@ describe('db', function () {
       expect(db('ns').name).to.equal('ns');
     });
 
-    it('calls redis.createClient with default options', function () {
+    it('calls redis.createClient on client read', function () {
       redis.createClient.reset();
       expect(redis.createClient).to.not.have.been.called;
 
-      db('foo');
+      var database = db('foo');
 
+      expect(redis.createClient).to.not.have.been.called;
+
+      expect(database.client).to.not.be.null;
       expect(redis.createClient).to.have.been.called;
     });
   });

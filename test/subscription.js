@@ -30,20 +30,17 @@ describe('Subscription', function () {
 
   describe('#touch', function () {
     it('updates the timestamp', function () {
-      var a, b, s = new Subscription();
+      var a, s = new Subscription();
 
       expect(s.timestamp).to.be.null;
 
       s.touch();
       a = s.timestamp;
 
-      s.touch();
-      b = s.timestamp;
-
       expect(a).to.be.a('string');
-      expect(b).to.be.a('string');
 
-      expect(a).to.be.lessThan(b);
+      s.touch();
+      expect(a).to.be.below(s.timestamp);
     });
   });
 
@@ -223,7 +220,8 @@ describe('Subscription', function () {
         return expect(s.save())
           .to.eventually.be.fulfilled
           .and.equal(s)
-          .and.have.property('id').and.have.length(10);
+          .and.have.property('id')
+          .and.match(/^[\da-z]{10}$/);
       });
     });
 

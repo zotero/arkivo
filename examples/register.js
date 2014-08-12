@@ -1,5 +1,5 @@
 
-var Subscription = require('../lib/subscription');
+var controller = require('../lib/controller');
 
 if (process.argv.length < 3) {
   console.log('usage: node %s URL [KEY]\n', process.argv[1]);
@@ -7,8 +7,8 @@ if (process.argv.length < 3) {
 }
 
 
-Subscription
-  .register({
+controller
+  .subscribe({
     url: process.argv[2],
     key: process.argv[3]
   })
@@ -23,5 +23,5 @@ Subscription
   })
 
   .finally(function () {
-    Subscription.disconnect();
+    controller.stop();
   });

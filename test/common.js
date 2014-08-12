@@ -54,8 +54,12 @@ describe('common', function () {
         expect(common.id(i)).to.have.length(i);
     });
 
-    it('returns 8 characters by default', function () {
+    it('returns 10 characters by default', function () {
       expect(common.id()).to.have.length(10);
+    });
+
+    it('contains only valid characters', function () {
+      expect(common.id(20, 'ABCDEFGHIJK')).to.match(/^[A-K]{20}$/);
     });
 
     it('returns a pseudo-random string', function () {

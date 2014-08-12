@@ -28,6 +28,25 @@ describe('Subscription', function () {
     });
   });
 
+  describe('#touch', function () {
+    it('updates the timestamp', function () {
+      var a, b, s = new Subscription();
+
+      expect(s.timestamp).to.be.null;
+
+      s.touch();
+      a = s.timestamp;
+
+      s.touch();
+      b = s.timestamp;
+
+      expect(a).to.be.a('string');
+      expect(b).to.be.a('string');
+
+      expect(a).to.be.lessThan(b);
+    });
+  });
+
   describe('#version', function () {
     it('is zero by default', function () {
       expect((new Subscription()).version).to.equal(0);

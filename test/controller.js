@@ -9,5 +9,7 @@ chai.use(require('sinon-chai'));
 var controller = require('../lib/controller');
 
 describe('Controller', function () {
-  it('is an object', function () { expect(controller).to.be.an('object'); });
+  it('is an object', function () {
+    expect(controller).to.be.an('object');
+  });
 });

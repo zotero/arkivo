@@ -23,5 +23,5 @@ controller
   })
 
   .finally(function () {
-    controller.stop();
+    controller.shutdown();
   });

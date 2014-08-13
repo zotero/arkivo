@@ -7,12 +7,14 @@ chai.use(require('sinon-chai'));
 
 var B = require('bluebird');
 
-var controller = require('../lib/controller');
+var Controller = require('../lib/controller');
+var controller = Controller.singleton;
+
 var Subscription = require('../lib/subscription');
 
 describe('Controller', function () {
-  it('is an object', function () {
-    expect(controller).to.be.an('object');
+  it('is a Controller', function () {
+    expect(controller).to.be.instanceof(Controller);
   });
 
   describe('subscriptions', function () {

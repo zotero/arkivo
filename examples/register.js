@@ -1,5 +1,5 @@
 
-var controller = require('../lib/controller');
+var controller = require('../lib/controller').singleton;
 
 if (process.argv.length < 3) {
   console.log('usage: node %s URL [KEY]\n', process.argv[1]);

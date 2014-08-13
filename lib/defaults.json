@@ -8,10 +8,11 @@
   },
 
   "sync": {
-    "workers": 1
+    "workers": 8
   },
 
   "controller": {
+    "workers": 1,
     "port": 8888
   },
 

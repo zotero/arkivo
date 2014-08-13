@@ -19,4 +19,10 @@ describe('Message queue', function () {
       expect(q.jobs).to.be.an('object');
     });
   });
+
+  describe('.app', function () {
+    it('is an object', function () {
+      expect(q.app).to.be.a('function');
+    });
+  });
 });

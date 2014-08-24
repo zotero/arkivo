@@ -78,26 +78,26 @@ describe('Subscription', function () {
       expect(s.url).to.equal('');
     });
 
-    it('is composed of pathname and params', function () {
-      expect(s.pathname).to.be.null;
+    it('is composed of path and params', function () {
+      expect(s.path).to.be.null;
       expect(s.params).to.be.empty;
 
-      s.pathname = 'foo';
+      s.path = 'foo';
       expect(s.url).to.equal('foo');
 
       s.params.bar = 'baz';
       expect(s.url).to.equal('foo?bar=baz');
     });
 
-    it('sets pathname and params automatically', function () {
+    it('sets path and params automatically', function () {
       s.url = 'foo/bar?baz=true';
 
-      expect(s.pathname).to.equal('foo/bar');
+      expect(s.path).to.equal('foo/bar');
       expect(s.params).to.have.property('baz', 'true');
 
       s = new Subscription({ url: 'tra/la/la?debug=false' });
 
-      expect(s.pathname).to.equal('tra/la/la');
+      expect(s.path).to.equal('tra/la/la');
       expect(s.params).to.have.property('debug', 'false');
     });
   });
@@ -200,7 +200,7 @@ describe('Subscription', function () {
     it('saves all keys', function () {
       var s = new Subscription();
 
-      s.pathname = 'foo';
+      s.path = 'foo';
       s.params.bar = 'baz';
       s.key = '42';
 

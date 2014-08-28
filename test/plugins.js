@@ -71,14 +71,15 @@ describe('Plugins', function () {
               process: noop,
               parameters: {
                 foo: { mandatory: true },
-                bar: { default: 'baz' }
+                bar: { default: 'baz' },
+                numeric: { validate: /^\d+$/ }
               }
             })
             .use('noop');
         });
 
         it('sets the parameters to the passed-in values', function () {
-          plugin.configure({ foo: 'bar', bar: 'foo' });
+          plugin.configure({ foo: 'bar', bar: 'foo', numeric: '42' });
 
           expect(plugin.options).to.have.property('foo', 'bar');
           expect(plugin.options).to.have.property('bar', 'foo');
@@ -92,6 +93,12 @@ describe('Plugins', function () {
         it('fails if a mandatory parameter has no value', function () {
           expect(function () {
             plugin.configure({ bar: 'baz' });
+          }).to.throw();
+        });
+
+        it('fails if passed invalid parameter values', function () {
+          expect(function () {
+            plugin.configure({ foo: 'bar', numeric: 'forty-two' });
           }).to.throw();
         });
       });

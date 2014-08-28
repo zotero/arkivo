@@ -1,4 +1,7 @@
+
+require('../lib/plugins/logger');
 var sync = require('../lib/sync').singleton;
+
 
 sync
   .process()

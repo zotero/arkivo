@@ -10,7 +10,10 @@ if (process.argv.length < 3) {
 controller
   .subscribe({
     url: process.argv[2],
-    key: process.argv[3]
+    key: process.argv[3],
+    plugins: [
+      { name: 'logger', options: { method: 'info' }}
+    ]
   })
 
   .then(function (s) {

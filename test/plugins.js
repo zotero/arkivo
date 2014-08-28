@@ -44,4 +44,57 @@ describe('Plugins', function () {
       expect(plugins.names).to.include('foo', 'bar');
     });
   });
+
+  describe('Plugin', function () {
+    var plugin;
+
+    describe('#configure', function () {
+
+      describe('when the plugin has no parameters', function () {
+        beforeEach(function () {
+          plugin = plugins
+            .add({ name: 'noop', process: noop })
+            .use('noop');
+        });
+
+        it('does not do anything', function () {
+          plugin.configure({ foo: 'bar' });
+          expect(plugin).to.not.have.property('options');
+        });
+      });
+
+      describe('when the plugin has parameters', function () {
+        beforeEach(function () {
+          plugin = plugins
+            .add({
+              name: 'noop',
+              process: noop,
+              parameters: {
+                foo: { mandatory: true },
+                bar: { default: 'baz' }
+              }
+            })
+            .use('noop');
+        });
+
+        it('sets the parameters to the passed-in values', function () {
+          plugin.configure({ foo: 'bar', bar: 'foo' });
+
+          expect(plugin.options).to.have.property('foo', 'bar');
+          expect(plugin.options).to.have.property('bar', 'foo');
+        });
+
+        it('sets the parameters to their default values', function () {
+          plugin.configure({ foo: 'bar' });
+          expect(plugin.options).to.have.property('bar', 'baz');
+        });
+
+        it('fails if a mandatory parameter has no value', function () {
+          expect(function () {
+            plugin.configure({ bar: 'baz' });
+          }).to.throw();
+        });
+      });
+    });
+  });
 });

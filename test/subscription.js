@@ -50,6 +50,18 @@ describe('Subscription', function () {
     });
   });
 
+  describe('#library', function () {
+    it('returns the URLs library part', function () {
+      var s = new Subscription();
+
+      s.url = '/users/123/foo';
+      expect(s.library).to.eql('/users/123');
+
+      s.url = '/groups/123/foo';
+      expect(s.library).to.eql('/groups/123');
+    });
+  });
+
   describe('#version', function () {
     it('is zero by default', function () {
       expect((new Subscription()).version).to.equal(0);

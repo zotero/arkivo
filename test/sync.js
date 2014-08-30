@@ -49,13 +49,6 @@ describe('Synchronization', function () {
       expect(s.deleted).to.eql(['b']);
     });
 
-    it('saves the new items', function () {
-      s.diff({ a: 1, b: 3 }, { a: 1, b: 3 });
-
-      expect(s.items).to.have.property('a', 1);
-      expect(s.items).to.have.property('b', 3);
-    });
-
     it('returns empty CRUD lists when items stay the same', function () {
       s.diff({ a: 1, b: 2 }, { a: 1, b: 2 });
 

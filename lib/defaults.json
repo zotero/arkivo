@@ -12,7 +12,11 @@
   },
 
   "controller": {
-    "workers": 1,
+    "workers": 1
+  },
+
+  "ui": {
+    "title": "Arkivo",
     "port": 8888
   },
 

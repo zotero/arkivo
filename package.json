@@ -7,7 +7,7 @@
     "arkivo": "./bin/arkivo.js",
     "arkivo-start": "./bin/arkivo-start.js",
     "arkivo-stop": "./bin/arkivo-stop.js",
-    "arkivo-subscribe": "./bin/arkivo-subscribe.js",
+    "arkivo-subscriptions": "./bin/arkivo-subscriptions.js",
     "arkivo-sync": "./bin/arkivo-sync.js"
   },
   "scripts": {

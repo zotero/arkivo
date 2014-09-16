@@ -10,10 +10,11 @@ program
 
 program
   .command('list')
-  .option('-k, --keys', 'show Zotero API keys in output')
   .description('list all subscription')
 
-  .action(function () {
+  .option('-k, --keys', 'show Zotero API keys in output')
+
+  .action(function list() {
 
     var print = program.keys ?
       function (s) { console.log('  %s %s %s', s.id, s.url, s.key); } :
@@ -36,6 +37,9 @@ program
       .catch(function (error) {
       });
   });
+
+// add
+// remove
 
 program.parse(process.argv);
 

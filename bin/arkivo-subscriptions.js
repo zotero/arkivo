@@ -131,5 +131,42 @@ program
     });
   });
 
+program
+  .command('add [url] [plugins] [key]')
+  .description('Subscribe to the given Zotero URL')
+
+  .action(function add(url, plugins, key) {
+    var s = new Subscription();
+
+    if (url) {
+      s.url = url;
+
+      if (key) s.key = key;
+
+      if (plugins) {
+        plugins.split(',').forEach(function (name) {
+          // TODO check if available!
+          s.plugins.push({ name: name });
+        });
+      }
+
+    } else {
+      console.log('interactive mode');
+      return shutdown();
+    }
+
+    s.save()
+      .tap(function () {
+        console.log('Subscription added as "%s".', s.id);
+      })
+
+      .catch(function (error) {
+        console.log('Failed to add subscription: %s', error.message);
+        console.error(error.stack);
+      })
+
+      .finally(shutdown);
+  });
+
 program.parse(process.argv);
 

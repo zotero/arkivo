@@ -25,4 +25,12 @@ program
     });
   });
 
+program
+  .command('show <name>')
+  .description('Prints the full plugin details')
+
+  .action(function show(name) {
+    // TODO
+  });
+
 program.parse(process.argv);

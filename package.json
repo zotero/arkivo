@@ -28,6 +28,7 @@
   "homepage": "https://github.com/inukshuk/arkivo",
   "dependencies": {
     "bluebird": "^2.2.2",
+    "co-prompt": "^1.0.0",
     "commander": "^2.3.0",
     "debug": "~1.0.3",
     "express": "^4.9.0",

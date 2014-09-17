@@ -2,21 +2,23 @@
 
 require('gnode');
 
+var B       = require('bluebird');
 var program = require('commander');
+
 var Subscription = require('../lib/subscription');
+
 
 function shutdown() {
   Subscription.db.reset();
 }
 
 program
-  .version(require('../package.json').version);
+  .version(require('../package.json').version)
+  .option('-k, --keys', 'show Zotero API keys in output');
 
 program
   .command('list')
-  .description('list all subscription')
-
-  .option('-k, --keys', 'show Zotero API keys in output')
+  .description('List all subscriptions')
 
   .action(function list() {
 
@@ -28,12 +30,8 @@ program
       .all()
 
       .then(function (subscriptions) {
-        if (subscriptions.length) {
-          subscriptions.forEach(print);
-
-        } else {
-          console.log('No subscriptions');
-        }
+        console.log('%d subscription(s) found.', subscriptions.length);
+        subscriptions.forEach(print);
 
         return subscriptions;
       })
@@ -46,9 +44,53 @@ program
       .finally(shutdown);
   });
 
-// add
-// remove
-// show
+
+program
+  .command('show <subscriptions>')
+  .description('Print details of given subscription(s)')
+
+  .action(function show(ids) {
+
+    function pad(string, padding, max) {
+      while (string.length < max)
+        string = padding + string;
+
+      return string;
+    }
+
+    function print(name, value) {
+      console.log('%s: %s', pad(name, ' ', 18), value);
+    }
+
+    B.map(ids.split(','), function (id) {
+      return Subscription.load(id);
+    })
+
+      .each(function (s, idx) {
+        if (idx) console.log('');
+
+        print('Subscription', s.id);
+        print('Zotero URL', s.url);
+
+        if (program.keys)
+          print('API key', s.key);
+
+        print('Plugins', s.plugins.map(function (p) {
+          return p.name;
+        }).join(', '));
+
+        print('Current version', s.version);
+        print('Last updated at', s.timestamp);
+      })
+
+      .catch(function (error) {
+        console.log('Failed to show subscription(s): %s', error.message);
+        console.error(error.stack);
+      })
+
+      .finally(shutdown);
+
+  });
 
 program.parse(process.argv);
 

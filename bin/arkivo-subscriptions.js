@@ -5,6 +5,10 @@ require('gnode');
 var program = require('commander');
 var Subscription = require('../lib/subscription');
 
+function shutdown() {
+  Subscription.db.reset();
+}
+
 program
   .version(require('../package.json').version);
 
@@ -35,11 +39,16 @@ program
       })
 
       .catch(function (error) {
-      });
+        console.log('Failed to list subscriptions: %s', error.message);
+        console.error(error.stack);
+      })
+
+      .finally(shutdown);
   });
 
 // add
 // remove
+// show
 
 program.parse(process.argv);
 

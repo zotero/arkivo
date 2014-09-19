@@ -16,8 +16,8 @@ function shutdown() {
   process.stdin.destroy();
 }
 
-function list(string) {
-  return string.split(',');
+function plugin(string, list) {
+  return list.concat(string.split(','));
 }
 
 program
@@ -143,14 +143,14 @@ program
   .description('Subscribe to the given Zotero URL')
 
   .option('-K, --key <key>', 'set Zotero API key')
-  .option('-P, --plugins <plugins', 'set plugins', list)
+  .option('-P, --plugins <plugin>', 'add plugin by name', plugin, [])
 
   .action(function add(url, options) {
     var s = new Subscription({ url: url });
 
     if (options.key) s.key = options.key;
 
-    if (options.plugins) {
+    if (options.plugins.length) {
       options.plugins.forEach(function (name) {
 
         if (!arkivo.plugins.available[name])

@@ -35,6 +35,7 @@
     "gnode": "^0.1.0",
     "kue": "~0.8.2",
     "redis": "~0.11.0",
+    "tabtab": "0.0.2",
     "zotero": "inukshuk/zotero-node"
   },
   "devDependencies": {

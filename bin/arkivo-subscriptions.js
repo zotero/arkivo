@@ -7,7 +7,8 @@ var B       = require('bluebird');
 var program = require('commander');
 var user    = require('co-prompt');
 
-var Subscription = require('../lib/subscription');
+var arkivo = require('..');
+var Subscription = arkivo.Subscription;
 
 
 function shutdown() {
@@ -15,8 +16,12 @@ function shutdown() {
   process.stdin.destroy();
 }
 
+function list(string) {
+  return string.split(',');
+}
+
 program
-  .version(require('../package.json').version)
+  .version(arkivo.version)
   .option('-k, --keys', 'show Zotero API keys in output');
 
 program
@@ -132,28 +137,27 @@ program
     });
   });
 
+
 program
-  .command('add [url] [plugins] [key]')
+  .command('add <url>')
   .description('Subscribe to the given Zotero URL')
 
-  .action(function add(url, plugins, key) {
-    var s = new Subscription();
+  .option('-K, --key <key>', 'set Zotero API key')
+  .option('-P, --plugins <plugins', 'set plugins', list)
 
-    if (url) {
-      s.url = url;
+  .action(function add(url, options) {
+    var s = new Subscription({ url: url });
 
-      if (key) s.key = key;
+    if (options.key) s.key = options.key;
 
-      if (plugins) {
-        plugins.split(',').forEach(function (name) {
-          // TODO check if available!
-          s.plugins.push({ name: name });
-        });
-      }
+    if (options.plugins) {
+      options.plugins.forEach(function (name) {
 
-    } else {
-      console.log('interactive mode');
-      return shutdown();
+        if (!arkivo.plugins.available[name])
+          console.log('Warning: plugin %s not found', name);
+
+        s.plugins.push({ name: name });
+      });
     }
 
     s.save()

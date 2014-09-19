@@ -8,8 +8,12 @@ var program = require('commander');
 var user    = require('co-prompt');
 
 var arkivo = require('..');
+var common = require('../lib/common');
+
 var Subscription = arkivo.Subscription;
 
+
+// --- Helper Functions ---
 
 function shutdown() {
   Subscription.db.reset();
@@ -19,6 +23,41 @@ function shutdown() {
 function plugin(string, list) {
   return list.concat(string.split(','));
 }
+
+function confirm(question) {
+  return new B(function (resolve, reject) {
+    user.confirm(question)(function (error, ok) {
+      if (error) return reject(error);
+      resolve(ok);
+    });
+  });
+}
+
+function confirmable(method, ids, action) {
+  ids = ids.split(',');
+
+  var question = common.capitalize(method) +
+    ' ' + ids.length + ' subscription(s). Proceed? ';
+
+  return confirm(question)
+
+    .then(function (ok) {
+      if (!ok) return [];
+
+      return B.map(ids, function (id) {
+        return Subscription.load(id).then(action);
+      });
+    })
+
+    .catch(function (error) {
+      console.log( 'Failed to %s subscription(s): %s', method, error.message);
+      console.error(error.stack);
+    });
+}
+
+
+
+// --- Commands ---
 
 program
   .version(arkivo.version)
@@ -101,42 +140,41 @@ program
   });
 
 
+
+
 program
   .command('remove <subscriptions>')
   .description('Remove the given subscription(s)')
 
   .action(function remove(ids) {
-    ids = ids.split(',');
 
-    var question =
-      'Remove ' + ids.length + ' subscription(s). Proceed? ';
+    confirmable('remove', ids, function (sub) {
+      return sub.destroy();
+    })
 
-    user.confirm(question)(function (error, ok) {
-      if (error) console.error(error.message);
+    .tap(function (subs) {
+      console.log('%d subscription(s) removed.', subs.length);
+    })
 
-      if (!ok) {
-        console.log('No subcriptions removed.');
-        return shutdown();
-      }
-
-      B.map(ids, function (id) {
-        return Subscription
-          .load(id)
-          .then(function (s) { return s.destroy(); });
-      })
-        .tap(function (subscriptions) {
-          console.log('%d subscription(s) removed.', subscriptions.length);
-        })
-
-        .catch(function (error) {
-          console.log('Failed to remove subscription(s): %s', error.message);
-          console.error(error.stack);
-        })
-
-        .finally(shutdown);
-    });
+    .finally(shutdown);
   });
 
+program
+  .command('reset <subscriptions>')
+  .description('Reset the given subscription(s)')
+
+  .action(function reset(ids) {
+
+    confirmable('reset', ids, function (sub) {
+      return sub.reset().save();
+    })
+
+    .tap(function (subs) {
+      console.log('%d subscription(s) reset.', subs.length);
+    })
+
+    .finally(shutdown);
+  });
 
 program
   .command('add <url>')

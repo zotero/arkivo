@@ -5,10 +5,8 @@
   "main": "lib/arkivo.js",
   "bin": {
     "arkivo": "./bin/arkivo.js",
-    "arkivo-start": "./bin/arkivo-start.js",
     "arkivo-plugins": "./bin/arkivo-plugins.js",
-    "arkivo-subscriptions": "./bin/arkivo-subscriptions.js",
-    "arkivo-sync": "./bin/arkivo-sync.js"
+    "arkivo-subscriptions": "./bin/arkivo-subscriptions.js"
   },
   "scripts": {
     "test": "make test"

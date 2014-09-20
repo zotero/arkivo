@@ -40,19 +40,20 @@ function confirmable(method, ids, action) {
     ' ' + ids.length + ' subscription(s). Proceed? ';
 
   return confirm(question)
-
     .then(function (ok) {
-      if (!ok) return [];
-
-      return B.map(ids, function (id) {
-        return Subscription.load(id).then(action);
-      });
+      return ok ? load(ids).each(action) : [];
     })
 
     .catch(function (error) {
       console.log( 'Failed to %s subscription(s): %s', method, error.message);
       console.error(error.stack);
     });
+}
+
+function load(ids) {
+  return B.map(ids, function (id) {
+    return Subscription.load(id);
+  });
 }
 
 function redis(input) {
@@ -86,12 +87,11 @@ program
     Subscription
       .all()
 
-      .then(function (subscriptions) {
-        console.log('%d subscription(s) found.', subscriptions.length);
-        subscriptions.forEach(print);
-
-        return subscriptions;
+      .tap(function (s) {
+        console.log('%d subscription(s) found.', s.length);
       })
+
+      .each(print)
 
       .catch(function (error) {
         console.log('Failed to list subscriptions: %s', error.message);
@@ -119,10 +119,9 @@ program
       console.log('%s: %s', pad(name, ' ', 18), value);
     }
 
-    B.map(ids.split(','), function (id) {
-      return Subscription.load(id);
-    })
+    function to_name(o) { return o.name; }
 
+    load(ids.split(','))
       .each(function (s, idx) {
         if (idx) console.log('');
 
@@ -132,9 +131,7 @@ program
         if (program.keys)
           print('API key', s.key);
 
-        print('Plugins', s.plugins.map(function (p) {
-          return p.name;
-        }).join(', '));
+        print('Plugins', s.plugins.map(to_name).join(', '));
 
         print('Current version', s.version);
         print('Last updated at', s.timestamp);
@@ -146,9 +143,7 @@ program
       })
 
       .finally(shutdown);
-
   });
-
 
 
 
@@ -162,8 +157,8 @@ program
       return sub.destroy();
     })
 
-    .tap(function (subs) {
-      console.log('%d subscription(s) removed.', subs.length);
+    .tap(function (s) {
+      console.log('%d subscription(s) removed.', s.length);
     })
 
     .finally(shutdown);

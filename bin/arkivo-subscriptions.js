@@ -55,13 +55,23 @@ function confirmable(method, ids, action) {
     });
 }
 
+function redis(input) {
+  var cfg = input.split(':');
+
+  if (cfg[0]) arkivo.config.redis.host = cfg[0];
+  if (cfg[1]) arkivo.config.redis.port = cfg[1];
+
+  return cfg;
+}
 
 
 // --- Commands ---
 
 program
   .version(arkivo.version)
-  .option('-k, --keys', 'show Zotero API keys in output');
+
+  .option('-k, --keys', 'show Zotero API keys in output')
+  .option('-r, --redis <host:port>', 'configure the Redis connection', redis);
 
 program
   .command('list')

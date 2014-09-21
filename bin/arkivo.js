@@ -16,7 +16,6 @@ var controller = arkivo.controller;
 
 program
   .version(arkivo.version)
-
   .option('-r, --redis <host:port>', 'configure the Redis connection', redis);
 
 
@@ -30,12 +29,13 @@ program
 
     controller.start();
 
-    process.once('SIGTERM', function () {
+    process.once('SIGINT', function () {
       debug('sigterm received: shutting down...');
 
       controller
         .stop()
         .then(shutdown)
+        .then(quit) // Can be removed with next Kue version
 
         .catch(function (error) {
           debug('failed to shut down gracefully: %s', error.message);
@@ -55,9 +55,10 @@ program
 // --- Helpers ---
 
 function shutdown() {
-  arkivo.db.reset();
   process.stdin.destroy();
 }
+
+function quit() { process.exit(0); }
 
 function redis(input) {
   var cfg = input.split(':');

@@ -34,18 +34,41 @@ program
 
       controller
         .stop()
-        .then(shutdown)
         .then(quit) // Can be removed with next Kue version
 
-        .catch(function (error) {
-          debug('failed to shut down gracefully: %s', error.message);
-          debug(error.stack);
+        .catch(function (e) {
+          debug('failed to shut down gracefully: %s', e.message);
+          debug(e.stack);
 
           process.exit(1);
         });
     });
   });
 
+
+program
+  .command('sync [subscriptions]')
+  .description('synchronize the given subscriptions')
+
+  .action(function sync(ids) {
+    ids = ids ? ids.split(',') : [];
+
+    arkivo
+      .sync.process(ids)
+
+      .tap(function (s) {
+        console.log('%d subscription(s) synchronized', s.length);
+      })
+
+      .then(shutdown)
+
+      .catch(function (e) {
+        debug('Synchronization failed: %s', e.message);
+        debug(e.stack);
+
+        process.exit(1);
+      });
+  });
 
 program
   .command('plugins', 'Manage Arkivo plugins')
@@ -55,6 +78,7 @@ program
 // --- Helpers ---
 
 function shutdown() {
+  arkivo.db.reset();
   process.stdin.destroy();
 }
 

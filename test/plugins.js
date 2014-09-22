@@ -75,7 +75,7 @@ describe('Plugins', function () {
                 numeric: { validate: /^\d+$/ }
               }
             })
-            .use('noop');
+            .use('noop', { foo: 'bar' });
         });
 
         it('sets the parameters to the passed-in values', function () {

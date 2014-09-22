@@ -60,6 +60,7 @@ package { [
     'ghostscript',
     'mysql-common',
     'libmysqlclient-dev',
+    'unzip',
     'openjdk-7-jdk'
   ]:
   ensure => latest

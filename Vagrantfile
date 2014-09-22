@@ -15,7 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     arkivo.vm.provision "puppet" do |puppet|
       puppet.manifests_path = "puppet/manifests"
       puppet.module_path = "puppet/modules"
-      puppet.manifest_file  = "dev.pp"
+      puppet.manifest_file  = "arkivo.pp"
     end
   end
 

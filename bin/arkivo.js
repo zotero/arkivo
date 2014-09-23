@@ -50,11 +50,9 @@ program
   .command('sync [subscriptions]')
   .description('synchronize the given subscriptions')
 
-  .action(function sync(ids) {
-    ids = ids ? ids.split(',') : [];
-
+  .action(function sync(id) {
     arkivo
-      .sync.process(ids)
+      .controller.synchronize(id)
 
       .tap(function (s) {
         console.log('%d subscription(s) synchronized', s.length);

@@ -45,7 +45,7 @@ describe('Controller', function () {
       it('saves a subscription', function () {
         expect(Subscription.prototype.save).to.not.have.been.called;
 
-        return controller.subscribe({ foo: 'bar' })
+        return controller.subscribe({ url: 'bar' })
           .then(function () {
             expect(Subscription.prototype.save).to.have.been.called;
           });
@@ -54,16 +54,16 @@ describe('Controller', function () {
       it('notifies sync on success', function () {
         expect(controller.notify).to.not.have.been.called;
 
-        return controller.subscribe({ foo: 'bar' })
+        return controller.subscribe({ url: 'bar' })
           .then(function () {
             expect(controller.notify).to.have.been.called;
           });
       });
 
       it('eventually returns a new subscription', function () {
-        return expect(controller.subscribe({ foo: 'bar' }))
+        return expect(controller.subscribe({ url: 'bar' }))
           .to.eventually.be.instanceof(Subscription)
-          .and.to.have.property('foo', 'bar');
+          .and.to.have.property('url', 'bar');
       });
     });
 
@@ -72,14 +72,14 @@ describe('Controller', function () {
       it('loads the subscription', function () {
         expect(Subscription.load).to.not.have.been.called;
 
-        return controller.unsubscribe('baz')
+        return controller.unsubscribe({ id: 'baz' })
           .then(function () {
             expect(Subscription.load).to.have.been.calledWith('baz');
           });
       });
 
       it('eventually returns the destroyed subscription', function () {
-        return expect(controller.unsubscribe('bar'))
+        return expect(controller.unsubscribe({ id: 'bar' }))
           .to.eventually.be.instanceof(Subscription)
           .and.to.have.property('id', 'bar');
       });

@@ -160,10 +160,7 @@ program
         console.log('Subscription added as "%s".', s.id);
       })
 
-      .catch(function (error) {
-        console.log('Failed to add subscription: %s', error.message);
-        console.error(error.stack);
-      })
+      .catch(backtrace('Failed to add subscription'))
 
       .finally(shutdown);
   });

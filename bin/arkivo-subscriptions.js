@@ -30,6 +30,7 @@ program
 
 program
   .command('list')
+  .alias('ls')
   .description('List all subscriptions')
 
   .action(function list() {
@@ -97,6 +98,7 @@ program
 
 program
   .command('remove [subscriptions]')
+  .alias('rm')
   .description('Remove the given subscription(s)')
 
   .action(function remove(ids) {
@@ -166,6 +168,8 @@ program
   });
 
 program.parse(process.argv);
+
+if (!program.args.length) program.help();
 
 
 // --- Helper Functions ---

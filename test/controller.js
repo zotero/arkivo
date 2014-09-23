@@ -30,9 +30,12 @@ describe('Controller', function () {
       sinon.stub(Subscription, 'load', function (id) {
         return B.fulfilled(new Subscription({ id: id }));
       });
+
+      sinon.stub(controller, 'notify');
     });
 
     afterEach(function () {
+      controller.notify.restore();
       Subscription.prototype.save.restore();
       Subscription.prototype.destroy.restore();
       Subscription.load.restore();
@@ -45,6 +48,15 @@ describe('Controller', function () {
         return controller.subscribe({ foo: 'bar' })
           .then(function () {
             expect(Subscription.prototype.save).to.have.been.called;
+          });
+      });
+
+      it('notifies sync on success', function () {
+        expect(controller.notify).to.not.have.been.called;
+
+        return controller.subscribe({ foo: 'bar' })
+          .then(function () {
+            expect(controller.notify).to.have.been.called;
           });
       });
 

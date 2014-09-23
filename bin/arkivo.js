@@ -73,24 +73,6 @@ program
   .command('subscriptions', 'Manage Zotero URL subscriptions');
 
 
-// --- Helpers ---
-
-function shutdown() {
-  arkivo.db.reset();
-  process.stdin.destroy();
-}
-
-function quit() { process.exit(0); }
-
-function redis(input) {
-  var cfg = input.split(':');
-
-  if (cfg[0]) arkivo.config.redis.host = cfg[0];
-  if (cfg[1]) arkivo.config.redis.port = cfg[1];
-
-  return cfg;
-}
-
 // --- Tab-Completion ---
 
 if (process.argv[2] === 'completion') {
@@ -112,3 +94,23 @@ if (process.argv[2] === 'completion') {
 }
 
 program.parse(process.argv);
+
+if (!program.args.length) program.help();
+
+// --- Helpers ---
+
+function shutdown() {
+  arkivo.db.reset();
+  process.stdin.destroy();
+}
+
+function quit() { process.exit(0); }
+
+function redis(input) {
+  var cfg = input.split(':');
+
+  if (cfg[0]) arkivo.config.redis.host = cfg[0];
+  if (cfg[1]) arkivo.config.redis.port = cfg[1];
+
+  return cfg;
+}

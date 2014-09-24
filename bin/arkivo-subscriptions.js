@@ -43,10 +43,9 @@ program
       .all()
       .tap(num('found'))
       .each(print)
+      .tap(shutdown)
 
-      .catch(backtrace('Failed to list subscriptions'))
-
-      .finally(shutdown);
+      .catch(backtrace('Failed to list subscriptions'));
   });
 
 
@@ -89,9 +88,9 @@ program
         print('Last updated at', s.timestamp);
       })
 
-      .catch(backtrace('Failed to show subscription(s)'))
+      .tap(shutdown)
 
-      .finally(shutdown);
+      .catch(backtrace('Failed to show subscription(s)'));
   });
 
 
@@ -110,10 +109,9 @@ program
       }))
 
       .tap(num('removed'))
+      .tap(shutdown)
 
-      .catch(backtrace('Failed to remove subscription(s)'))
-
-      .finally(shutdown);
+      .catch(backtrace('Failed to remove subscription(s)'));
   });
 
 program
@@ -130,9 +128,9 @@ program
 
       .tap(num('reset'))
 
-      .catch(backtrace('Failed to reset subscription(s)'))
+      .tap(shutdown)
 
-      .finally(shutdown);
+      .catch(backtrace('Failed to reset subscription(s)'));
   });
 
 program
@@ -162,9 +160,8 @@ program
         console.log('Subscription added as "%s".', s.id);
       })
 
-      .catch(backtrace('Failed to add subscription'))
-
-      .finally(shutdown);
+      .tap(shutdown)
+      .catch(backtrace('Failed to add subscription'));
   });
 
 program.parse(process.argv);
@@ -189,6 +186,8 @@ function backtrace(message) {
   return function (e) {
     console.error([message, e.message].join(': '));
     console.error(e.stack);
+
+    process.exit(1);
   };
 }
 

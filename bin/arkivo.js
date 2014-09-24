@@ -37,7 +37,7 @@ program
         .then(quit) // Can be removed with next Kue version
 
         .catch(function (e) {
-          debug('failed to shut down gracefully: %s', e.message);
+          console.error('failed to shut down gracefully: %s', e.message);
           debug(e.stack);
 
           process.exit(1);
@@ -48,11 +48,16 @@ program
 
 program
   .command('sync [subscriptions]')
-  .description('synchronize the given subscriptions')
+  .description('synchronize the given (or all) subscription(s).')
 
-  .action(function sync(id) {
+  .option('-s, --skip', 'skip download and plugin dispatch')
+
+  .action(function sync(id, options) {
+
     arkivo
-      .controller.synchronize(id)
+      .controller.synchronize({
+        id: id, all: !id, skip: options.skip
+      })
 
       .tap(function (s) {
         console.log('%d subscription(s) synchronized', s.length);
@@ -61,7 +66,7 @@ program
       .then(shutdown)
 
       .catch(function (e) {
-        debug('Synchronization failed: %s', e.message);
+        console.error('Synchronization failed: %s', e.message);
         debug(e.stack);
 
         process.exit(1);

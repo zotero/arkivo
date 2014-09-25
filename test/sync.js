@@ -1,5 +1,6 @@
 //var sinon = require('sinon');
-var chai = require('chai');
+var chai   = require('chai');
+var sinon  = require('sinon');
 var expect = chai.expect;
 
 chai.use(require('chai-as-promised'));
@@ -7,6 +8,7 @@ chai.use(require('sinon-chai'));
 
 //var B = require('bluebird');
 
+var Subscription = require('../lib/subscription');
 var Synchronizer = require('../lib/sync');
 var Synchronization = Synchronizer.Synchronization;
 
@@ -25,6 +27,25 @@ describe('Synchronizer', function () {
 describe('Synchronization', function () {
   it('is a constructor', function () {
     expect(Synchronization).to.be.an('function');
+  });
+
+  describe('#get', function () {
+    var s;
+
+    beforeEach(function () {
+      sinon.stub(sync.zotero, 'get');
+      s = new Synchronization(new Subscription());
+    });
+
+    afterEach(function () {
+      sync.zotero.get.restore();
+    });
+
+    it('delegates to synchronizer\'s zotero client', function () {
+      expect(sync.zotero.get).to.not.have.been.called;
+      s.get('foo');
+      expect(sync.zotero.get).to.have.been.called;
+    });
   });
 
   describe('#diff', function () {
@@ -56,6 +77,5 @@ describe('Synchronization', function () {
       expect(s.updated).to.empty;
       expect(s.deleted).to.empty;
     });
-
   });
 });

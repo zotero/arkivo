@@ -10,10 +10,12 @@ var kue = require('kue');
 
 var q = require('../lib/q');
 
-describe('Message Queue', function () {
+describe('Q', function () {
   beforeEach(function () {
     sinon.stub(kue, 'createQueue', function () {
-      return {};
+      return {
+        shutdown: sinon.stub().yields()
+      };
     });
   });
 
@@ -34,6 +36,17 @@ describe('Message Queue', function () {
   describe('.app', function () {
     it('is an object', function () {
       expect(q.app).to.be.a('function');
+    });
+  });
+
+  describe('.shutdown', function () {
+    it('calls q.jobs.shutdown', function () {
+      expect(q.jobs.shutdown).to.not.have.been.called;
+
+      return q.shutdown()
+        .then(function () {
+          expect(q.jobs.shutdown).to.have.been.called;
+        });
     });
   });
 });

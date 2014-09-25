@@ -37,11 +37,15 @@ describe('Plugins', function () {
     });
 
     it('registers the plugin with the given name', function () {
+      var count = plugins.count;
+
       plugins.add({ name: 'foo', process: noop });
       expect(plugins.names).to.eql(['foo']);
 
       plugins.add({ name: 'bar', process: noop });
       expect(plugins.names).to.include('foo', 'bar');
+
+      expect(plugins.count).to.eql(count + 2);
     });
   });
 

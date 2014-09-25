@@ -27,6 +27,14 @@ describe('Plugin "logger"', function () {
     expect(plugins.use('logger')).to.be.instanceof(plugins.Plugin);
   });
 
+  it('is configurable', function () {
+    expect(plugins.use('logger').configurable).to.be.true;
+  });
+
+  it('has a summary', function () {
+    expect(plugins.use('logger')).to.have.property('summary');
+  });
+
   describe('#process', function () {
     var sync;
 

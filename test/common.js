@@ -71,4 +71,12 @@ describe('common', function () {
       expect(Object.keys(ids).length).to.be.within(15, 16);
     });
   });
+
+  describe('.capitalize', function () {
+    it('capitalizes first letter of the passed-in string', function () {
+      expect(common.capitalize('foo')).to.eql('Foo');
+      expect(common.capitalize('Foo')).to.eql('Foo');
+      expect(common.capitalize('')).to.eql('');
+    });
+  });
 });

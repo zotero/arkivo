@@ -8,6 +8,8 @@ chai.use(require('sinon-chai'));
 
 var B = require('bluebird');
 
+var plugins = require('../lib/plugins');
+
 var Subscription = require('../lib/subscription');
 var Synchronizer = require('../lib/sync');
 var Synchronization = Synchronizer.Synchronization;
@@ -119,7 +121,6 @@ describe('Synchronizer', function () {
   });
 
   describe('#update', function () {
-
     beforeEach(function () {
       sinon.stub(sync, 'synchronize', delayed);
     });
@@ -139,6 +140,74 @@ describe('Synchronizer', function () {
       });
     });
   });
+
+  describe('#dispatch', function () {
+    var data;
+
+    beforeEach(function () {
+      data = new Synchronization(new Subscription());
+      data.version = 1;
+    });
+
+    it('works when there are no plugins', function () {
+      return expect(sync.dispatch(data)).to.be.fulfilled;
+    });
+
+    describe('when there are plugins', function () {
+      var one, two;
+
+      beforeEach(function () {
+        one = sinon.stub().yields();
+        two = sinon.stub();
+
+        plugins.add({ name: 'one', process: one });
+        plugins.add({ name: 'two', process: two });
+
+        data.subscription.plugins.push({ name: 'one' });
+      });
+
+      afterEach(function () {
+        plugins.reset();
+      });
+
+      it('dispatches the sync data to all plugins', function () {
+        return sync.dispatch(data)
+          .then(function () {
+            expect(one).to.have.been.called;
+            expect(one.args[0][0]).to.equal(data);
+
+            expect(two).to.not.have.been.called;
+          });
+      });
+
+      describe('but not all are available', function () {
+        beforeEach(function () { plugins.reset(); });
+
+        it('does not fail', function () {
+          return expect(sync.dispatch(data)).to.be.fulfilled;
+        });
+      });
+
+      describe('that return a promise', function () {
+        var three;
+
+        beforeEach(function () {
+          three = sinon.stub().returns(B.delay(0));
+
+          plugins.add({ name: 'three',  process: three });
+          data.subscription.plugins.push({ name: 'three' });
+        });
+
+        it('works', function () {
+          return sync.dispatch(data)
+            .then(function () {
+              expect(three).to.have.been.called;
+            });
+          });
+      });
+    });
+  });
+
 });
 
 describe('Synchronization', function () {

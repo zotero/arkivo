@@ -117,6 +117,28 @@ describe('Synchronizer', function () {
         });
     });
   });
+
+  describe('#update', function () {
+
+    beforeEach(function () {
+      sinon.stub(sync, 'synchronize', delayed);
+    });
+
+    afterEach(function () {
+      sync.synchronize.restore();
+    });
+
+    it('delegates to .synchronize with skip set to true', function () {
+      var sub = {};
+
+      return sync.update(sub).then(function () {
+        expect(sync.synchronize).to.have.been.called;
+
+        expect(sync.synchronize.args[0][0]).to.equal(sub);
+        expect(sync.synchronize.args[0][1]).to.be.true;
+      });
+    });
+  });
 });
 
 describe('Synchronization', function () {

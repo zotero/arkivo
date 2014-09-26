@@ -12,8 +12,8 @@ var plugins = require('../lib/plugins');
 
 var Subscription = require('../lib/subscription');
 var Synchronizer = require('../lib/sync');
-var Synchronization = Synchronizer.Synchronization;
 
+var Session = Synchronizer.Session;
 var sync = Synchronizer.singleton;
 
 function delayed() { return B.delay(0); }
@@ -37,18 +37,18 @@ describe('Synchronizer', function () {
       sinon.spy(sub, 'touch');
       sinon.stub(sub, 'update');
 
-      sinon.stub(Synchronization.prototype, 'execute', delayed);
+      sinon.stub(Session.prototype, 'execute', delayed);
       sinon.stub(sync, 'dispatch', delayed);
     });
 
     afterEach(function () {
-      Synchronization.prototype.execute.restore();
+      Session.prototype.execute.restore();
       sync.dispatch.restore();
     });
 
-    it('returns a promise for Synchronization instance', function () {
+    it('returns a promise for Session instance', function () {
       return expect(sync.synchronize(sub))
-        .to.eventually.be.instanceof(Synchronization);
+        .to.eventually.be.instanceof(Session);
     });
 
     it('touches and saves the subscription', function () {
@@ -65,14 +65,14 @@ describe('Synchronizer', function () {
     });
 
     it('passes the skip option on to the synchronization', function () {
-      expect(Synchronization.prototype.execute).to.not.have.been.called;
+      expect(Session.prototype.execute).to.not.have.been.called;
 
       return B.all([
           sync.synchronize(sub),
           sync.synchronize(sub, true),
         ])
         .then(function () {
-          var execute = Synchronization.prototype.execute;
+          var execute = Session.prototype.execute;
 
           expect(execute).to.have.been.calledTwice;
 
@@ -83,10 +83,10 @@ describe('Synchronizer', function () {
 
     describe('when there are modification', function () {
       beforeEach(function () {
-        Synchronization.prototype.version = 42;
+        Session.prototype.version = 42;
       });
       afterEach(function () {
-        delete Synchronization.prototype.version;
+        delete Session.prototype.version;
       });
 
       it('updates the subscription', function () {
@@ -145,7 +145,7 @@ describe('Synchronizer', function () {
     var data;
 
     beforeEach(function () {
-      data = new Synchronization(new Subscription());
+      data = new Session(new Subscription());
       data.version = 1;
     });
 
@@ -210,9 +210,9 @@ describe('Synchronizer', function () {
 
 });
 
-describe('Synchronization', function () {
+describe('Session', function () {
   it('is a constructor', function () {
-    expect(Synchronization).to.be.an('function');
+    expect(Session).to.be.an('function');
   });
 
   describe('#get', function () {
@@ -220,7 +220,7 @@ describe('Synchronization', function () {
 
     beforeEach(function () {
       sinon.stub(sync.zotero, 'get');
-      s = new Synchronization(new Subscription());
+      s = new Session(new Subscription());
     });
 
     afterEach(function () {
@@ -238,7 +238,7 @@ describe('Synchronization', function () {
     var s;
 
     beforeEach(function () {
-      s = new Synchronization();
+      s = new Session();
     });
 
     it('detects created items', function () {

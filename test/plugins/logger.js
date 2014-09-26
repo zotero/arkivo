@@ -11,7 +11,7 @@ chai.use(require('sinon-chai'));
 var plugins = require('../../lib/plugins');
 var logger  = require('../../lib/plugins/logger');
 
-var Synchronization = require('../../lib/sync').Synchronization;
+var Session = require('../../lib/sync').Session;
 var Subscription    = require('../../lib/subscription');
 
 describe('Plugin "logger"', function () {
@@ -39,7 +39,7 @@ describe('Plugin "logger"', function () {
     var sync;
 
     beforeEach(function () {
-      sync = new Synchronization(new Subscription({
+      sync = new Session(new Subscription({
         url: '/users/42/items'
       }));
 

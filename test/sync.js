@@ -28,16 +28,21 @@ describe('Synchronizer', function () {
   });
 
   describe('#synchronize', function () {
-    var sub;
+    var sub, version;
 
     beforeEach(function () {
-      sub = new Subscription({ url: '/users/42/items' });
+      version = 1;
+      sub = new Subscription({ url: '/users/42/items', version: version });
 
       sinon.stub(sub, 'save', delayed);
       sinon.spy(sub, 'touch');
       sinon.stub(sub, 'update');
 
-      sinon.stub(Session.prototype, 'execute', delayed);
+      sinon.stub(Session.prototype, 'execute', function () {
+        this.version = version;
+        return delayed();
+      });
+
       sinon.stub(sync, 'dispatch', delayed);
     });
 
@@ -81,17 +86,18 @@ describe('Synchronizer', function () {
         });
     });
 
-    describe('when there are modification', function () {
+    describe('when there are modifications', function () {
       beforeEach(function () {
-        Session.prototype.version = 42;
+        version = 42;
+        //Session.prototype.version = 42;
       });
       afterEach(function () {
-        delete Session.prototype.version;
+        //delete Session.prototype.version;
       });
 
       it('updates the subscription', function () {
         return sync.synchronize(sub)
-          .then(function () {
+          .then(function (s) {
             expect(sub.update).to.have.been.called;
             expect(sub.update.args[0][0]).to.have.property('version', 42);
           });

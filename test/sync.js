@@ -13,8 +13,9 @@ var plugins = require('../lib/plugins');
 var Subscription = require('../lib/subscription');
 var Synchronizer = require('../lib/sync');
 
-var Session = Synchronizer.Session;
-var sync = Synchronizer.singleton;
+var Session          = Synchronizer.Session;
+var InterruptedError = Synchronizer.InterruptedError;
+var sync             = Synchronizer.singleton;
 
 function delayed() { return B.delay(0); }
 
@@ -217,16 +218,16 @@ describe('Synchronizer', function () {
 });
 
 describe('Session', function () {
+  var session;
+
   it('is a constructor', function () {
     expect(Session).to.be.an('function');
   });
 
   describe('#get', function () {
-    var s;
-
     beforeEach(function () {
       sinon.stub(sync.zotero, 'get');
-      s = new Session(new Subscription());
+      session = new Session(new Subscription());
     });
 
     afterEach(function () {
@@ -235,8 +236,27 @@ describe('Session', function () {
 
     it('delegates to synchronizer\'s zotero client', function () {
       expect(sync.zotero.get).to.not.have.been.called;
-      s.get('foo');
+      session.get('foo');
       expect(sync.zotero.get).to.have.been.called;
+    });
+  });
+
+  describe('#check', function () {
+    beforeEach(function () { session = new Session(); });
+
+    it('returns true if the session has no version yet', function () {
+      expect(session.check()).to.be.true;
+      expect(session.check(42)).to.be.true;
+    });
+
+    it('returns true if the versions match', function () {
+      session.version = 42;
+      expect(session.check(42)).to.be.true;
+    });
+
+    it('throws InterruptedError if versions do not match', function () {
+      session.version = 42;
+      expect(session.check.bind(session, 23)).to.throw(InterruptedError);
     });
   });
 

@@ -94,7 +94,6 @@ program
   });
 
 
-
 program
   .command('remove [subscriptions]')
   .alias('rm')

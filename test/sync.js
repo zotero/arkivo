@@ -224,6 +224,87 @@ describe('Session', function () {
     expect(Session).to.be.an('function');
   });
 
+  it('it uses its subscription\'s id', function () {
+    session = new Session();
+
+    expect(session.id).to.be.undefined;
+
+    session.subscription = { id: 3 };
+    expect(session.id).to.eql(3);
+  });
+
+  describe('#execute', function () {
+    beforeEach(function () {
+      session = new Session(new Subscription());
+
+      sinon.stub(session, 'update', delayed);
+      sinon.stub(session, 'download', delayed);
+    });
+
+    it('updates the session', function () {
+      expect(session.update).to.not.have.been.called;
+
+      return B.all([
+          session.execute(),
+          session.execute(true)
+        ]).then(function () {
+          expect(session.update).to.have.been.calledTwice;
+        });
+    });
+
+    it('downloads items unless skip option is set', function () {
+      expect(session.download).to.not.have.been.called;
+
+      return B.all([
+          session.execute(),
+          session.execute(true)
+        ]).then(function () {
+          expect(session.download).to.have.been.calledOnce;
+        });
+    });
+
+    describe('when interrupted', function () {
+      var max = 2;
+
+      beforeEach(function () {
+        session.update.restore();
+
+        sinon.stub(session, 'update', function () {
+          return delayed().then(function () {
+            if (--max) {
+              var e =  new InterruptedError('interrupted');
+              e.resume = 0;
+              throw e;
+            }
+          });
+        });
+
+        sinon.spy(session, 'execute');
+      });
+
+      it('retries execution if interrupted', function () {
+        expect(session.execute).to.not.have.been.called;
+
+        return expect(
+          session.execute().tap(function () {
+            expect(session.execute).to.have.been.calledTwice;
+          })
+        ).to.eventually.be.fulfilled;
+      });
+
+      it('fails after max retries', function () {
+        max = 3;
+
+        return expect(session.execute(true, 1)).to.eventually.be.rejected;
+      });
+    });
+
+    describe('when an error occurs', function () {
+      it('fails', function () {
+      });
+    });
+  });
+
   describe('#get', function () {
     beforeEach(function () {
       sinon.stub(sync.zotero, 'get');
@@ -237,7 +318,15 @@ describe('Session', function () {
     it('delegates to synchronizer\'s zotero client', function () {
       expect(sync.zotero.get).to.not.have.been.called;
       session.get('foo');
-      expect(sync.zotero.get).to.have.been.called;
+
+      expect(sync.zotero.get).to.have.been.calledWith('foo');
+    });
+
+    it('uses subscription\'s path by default', function () {
+      session.subscription.url = '/users/42/items';
+      session.get();
+
+      expect(sync.zotero.get).to.have.been.calledWith('/users/42/items');
     });
   });
 
@@ -261,33 +350,31 @@ describe('Session', function () {
   });
 
   describe('#diff', function () {
-    var s;
-
     beforeEach(function () {
-      s = new Session();
+      session = new Session();
     });
 
     it('detects created items', function () {
-      s.diff({ a: 1, b: 2, c: 4 }, { a: 1, b: 2 });
-      expect(s.created).to.eql(['c']);
+      session.diff({ a: 1, b: 2, c: 4 }, { a: 1, b: 2 });
+      expect(session.created).to.eql(['c']);
     });
 
     it('detects updated items', function () {
-      s.diff({ a: 1, b: 3, c: 4 }, { a: 1, b: 2 });
-      expect(s.updated).to.eql(['b']);
+      session.diff({ a: 1, b: 3, c: 4 }, { a: 1, b: 2 });
+      expect(session.updated).to.eql(['b']);
     });
 
     it('detects deleted items', function () {
-      s.diff({ a: 1, c: 4 }, { a: 1, b: 2 });
-      expect(s.deleted).to.eql(['b']);
+      session.diff({ a: 1, c: 4 }, { a: 1, b: 2 });
+      expect(session.deleted).to.eql(['b']);
     });
 
     it('returns empty CRUD lists when items stay the same', function () {
-      s.diff({ a: 1, b: 2 }, { a: 1, b: 2 });
+      session.diff({ a: 1, b: 2 }, { a: 1, b: 2 });
 
-      expect(s.created).to.empty;
-      expect(s.updated).to.empty;
-      expect(s.deleted).to.empty;
+      expect(session.created).to.empty;
+      expect(session.updated).to.empty;
+      expect(session.deleted).to.empty;
     });
   });
 });

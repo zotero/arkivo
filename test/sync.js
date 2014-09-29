@@ -315,6 +315,129 @@ describe('Session', function () {
     });
   });
 
+  describe('#update', function () {
+    function FakeMessage(version, more, interrupt) {
+      this.version   = version || 1;
+      this.more      = more || 0;
+      this.done      = this.more < 1;
+      this.interrupt = interrupt;
+
+      this.multi    = true;
+      this.modified = true;
+      this.type = 'json';
+
+      this.data = {};
+    }
+
+    FakeMessage.prototype.next = function () {
+      var m = this.interrupt ?
+        new FakeMessage(++this.version, --this.more) :
+        new FakeMessage(this.version, --this.more);
+
+      return delayed().then(function () { return m; });
+    };
+
+    beforeEach(function () {
+      session = new Session(new Subscription({
+        url: '/users/23/items'
+      }));
+
+      sinon.spy(session, 'diff');
+    });
+
+    describe('when the message is not modified', function () {
+      beforeEach(function () {
+        sinon.stub(session, 'get', function () {
+          var m = new FakeMessage();
+          m.modified = false;
+
+          return delayed().then(function () { return m; });
+        });
+      });
+
+      it('returns the session as not modified', function () {
+        return expect(session.update())
+          .to.eventually.equal(session)
+          .and.to.have.property('modified', false);
+      });
+
+      it('does not call #diff', function () {
+        return session.update().then(function () {
+          expect(session.diff).to.not.have.been.called;
+        });
+      });
+    });
+
+    describe('when the message is not JSON', function () {
+      beforeEach(function () {
+        sinon.stub(session, 'get', function () {
+          var m = new FakeMessage();
+          m.type = 'text/html';
+
+          return delayed().then(function () { return m; });
+        });
+      });
+
+      it('fails with an assertion error', function () {
+        return expect(session.update())
+          .to.eventually.be.rejectedWith(Error);
+      });
+    });
+
+    describe('when the message is modified', function () {
+      var more = 0, interrupt = false;
+
+      beforeEach(function () {
+        sinon.stub(session, 'get', function () {
+          return delayed().then(function () {
+            return new FakeMessage(1, more, interrupt);
+          });
+        });
+      });
+
+      it('returns the session as modified', function () {
+        return expect(session.update())
+          .to.eventually.equal(session)
+          .and.to.have.property('modified', true);
+      });
+
+      it('updates the session version', function () {
+        return expect(session.update())
+          .to.eventually.have.property('version', 1);
+      });
+
+      it('calls #diff', function () {
+        return session.update().then(function () {
+          expect(session.diff).to.have.been.called;
+        });
+      });
+
+      describe('and a multi response', function () {
+        beforeEach(function () { more = 2; });
+
+        it('returns the session as modified', function () {
+          return expect(session.update())
+            .to.eventually.equal(session)
+            .and.to.have.property('modified', true);
+        });
+
+        it('updates the session version', function () {
+          return expect(session.update())
+            .to.eventually.have.property('version', 1);
+        });
+
+        describe('and interrupted', function () {
+          beforeEach(function () { interrupt = true; });
+
+          it('fails with an interrupt', function () {
+            return expect(session.update())
+              .to.eventually.be.rejectedWith(InterruptedError);
+          });
+        });
+      });
+    });
+  });
+
   describe('#get', function () {
     beforeEach(function () {
       sinon.stub(sync.zotero, 'get');

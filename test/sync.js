@@ -295,7 +295,8 @@ describe('Session', function () {
       it('fails after max retries', function () {
         max = 3;
 
-        return expect(session.execute(true, 1)).to.eventually.be.rejected;
+        return expect(session.execute(true, 1))
+          .to.eventually.be.rejectedWith(InterruptedError);
       });
     });
 
@@ -308,7 +309,8 @@ describe('Session', function () {
       });
 
       it('fails', function () {
-        return expect(session.execute()).to.eventually.be.rejected;
+        return expect(session.execute())
+          .to.eventually.be.rejectedWith(Error, 'failed');
       });
     });
   });

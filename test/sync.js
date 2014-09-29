@@ -456,6 +456,31 @@ describe('Session', function () {
         .and.to.have.keys(['foo', 'bar', 'baz']);
     });
 
+    it('breaks early if there are no updated/created items', function () {
+      session.created.length = 0;
+      session.updated.length = 0;
+
+      return session.download()
+        .then(function (s) {
+          expect(s).to.equal(session);
+          expect(session.get).to.not.have.been.called;
+        });
+    });
+
+    it('breaks early if all items are up-to-date', function () {
+      session.items = {
+        foo: { version: 1 },
+        bar: { version: 1 },
+        baz: { version: 1 }
+      };
+
+      return session.download()
+        .then(function (s) {
+          expect(s).to.equal(session);
+          expect(session.get).to.not.have.been.called;
+        });
+    });
+
     it('skips up-to-date items', function () {
       session.versions.foo = 0;
       session.items.foo = { version: 0 };

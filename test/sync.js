@@ -401,6 +401,15 @@ describe('Session', function () {
           .and.to.have.property('modified', true);
       });
 
+      it('falls #get with format=versions and limit', function () {
+        return session.update().then(function () {
+          expect(session.get).to.have.been.called;
+          expect(session.get.args[0][0]).to.eql('/users/23/items');
+          expect(session.get.args[0][1]).to.have.property('format', 'versions');
+          expect(session.get.args[0][1]).to.have.property('limit');
+        });
+      });
+
       it('updates the session version', function () {
         return expect(session.update())
           .to.eventually.have.property('version', 1);

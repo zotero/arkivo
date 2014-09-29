@@ -11,6 +11,8 @@ var Subscription = require('../lib/subscription');
 var defaults = require('../lib/defaults');
 var db = require('../lib/db')(defaults.subscription.prefix);
 
+function delayed() { return B.delay(0); }
+
 describe('Subscription', function () {
   it('is a constructor function', function () {
     expect(Subscription).to.be.a('function');
@@ -50,6 +52,20 @@ describe('Subscription', function () {
     });
   });
 
+  describe('#reset', function () {
+    it('resets version and versions', function () {
+      var s = new Subscription();
+
+      expect(s.reset.bind(s)).to.not.throw();
+
+      s.version = 4;
+      expect(s.reset().version).to.eql(0);
+
+      s.versions = { foo: 3 };
+      expect(s.reset().versions).to.be.empty;
+    });
+  });
+
   describe('#library', function () {
     it('returns the URLs library part', function () {
       var s = new Subscription();
@@ -78,6 +94,22 @@ describe('Subscription', function () {
 
       s.version = 'foo';
       expect(s.version).to.equal(0);
+    });
+  });
+
+  describe('#header', function () {
+    it('returns an empty object by default', function () {
+      expect((new Subscription()).headers).to.be.empty;
+    });
+
+    it('includes authorization key', function () {
+      expect((new Subscription({ key: 'XYZ' })).headers)
+        .to.have.property('Authorization', 'Bearer XYZ');
+    });
+
+    it('includes if-modified-since-version', function () {
+      expect((new Subscription({ version: 23 })).headers)
+        .to.have.property('If-Modified-Since-Version', 23);
     });
   });
 
@@ -111,6 +143,85 @@ describe('Subscription', function () {
 
       expect(s.path).to.equal('tra/la/la');
       expect(s.params).to.have.property('debug', 'false');
+    });
+  });
+
+  describe('.find', function () {
+    describe('called without query', function () {
+      beforeEach(function () {
+        sinon.stub(Subscription, 'all', delayed);
+      });
+
+      afterEach(function () {
+        Subscription.all.restore();
+      });
+
+      it('delegates to .all', function () {
+        return Subscription.find()
+          .then(function () { expect(Subscription.all).to.have.been.called; });
+      });
+    });
+
+
+    describe('called with a query', function () {
+      var ids = ['foo', 'bar', 'baz'];
+
+      beforeEach(function () {
+        sinon.stub(Subscription, 'load', function (id) {
+          return delayed().then(function () {
+            return new Subscription({ id: id });
+          });
+        });
+
+        sinon.stub(Subscription, 'ids', function () {
+          return delayed().then(function () { return ids; });
+        });
+      });
+
+      afterEach(function () {
+        Subscription.load.restore();
+        Subscription.ids.restore();
+      });
+
+      describe('when there are no matches', function () {
+        it('eventually returns empty list', function () {
+          return expect(Subscription.find('x')).to.eventually.eql([]);
+        });
+      });
+
+      it('loads all subscriptions ids beginning with the query', function () {
+        return Subscription.find('ba')
+          .tap(function () {
+            expect(Subscription.load).to.have.been.calledWith('bar');
+            expect(Subscription.load).to.have.been.calledWith('baz');
+          })
+          .tap(function (res) {
+            expect(res.length).to.eql(2);
+          });
+      });
+
+      it('supports comma separated lists', function () {
+        return Subscription.find('z,ba,fo,xy')
+          .tap(function () {
+            expect(Subscription.load).to.have.been.calledWith('foo');
+            expect(Subscription.load).to.have.been.calledWith('bar');
+            expect(Subscription.load).to.have.been.calledWith('baz');
+          })
+          .tap(function (res) {
+            expect(res.length).to.eql(3);
+          });
+      });
+
+      it('loads all subscriptions ids matchting the pattern', function () {
+        return Subscription.find(/^foo|z$/)
+          .tap(function () {
+            expect(Subscription.load).to.have.been.calledWith('foo');
+            expect(Subscription.load).to.have.been.calledWith('baz');
+          })
+          .tap(function (res) {
+            expect(res.length).to.eql(2);
+          });
+      });
     });
   });
 
@@ -172,7 +283,7 @@ describe('Subscription', function () {
     });
   });
 
-  describe('#save', function () {
+  describe('persistence', function () {
     var t;
 
     function chainspy() {
@@ -183,6 +294,8 @@ describe('Subscription', function () {
       t = {
         sadd: chainspy(),
         hmset: chainspy(),
+        srem: chainspy(),
+        del: chainspy(),
         commit: B.fulfilled.bind(B)
       };
 
@@ -200,54 +313,73 @@ describe('Subscription', function () {
       Subscription.exists.restore();
     });
 
-    it('returns a promise for the saved subscription', function () {
-      var s = new Subscription({ url: 'foo' });
+    describe('#destroy', function () {
+      it('returns the destroyed instance', function () {
+        var s = new Subscription();
+        return expect(s.destroy()).to.eventually.equal(s);
+      });
 
-      return expect(s.save())
-        .to.eventually.be.fulfilled
-        .and.equal(s)
-        .and.have.property('url', 'foo');
+      it('removes id and contents', function () {
+        return (new Subscription({ id: 'myid' }))
+          .destroy()
+          .then(function () {
+            expect(t.srem.args[0][0]).to.eql('ids');
+            expect(t.srem.args[0][1]).to.eql('myid');
+            expect(t.del.args[0][0]).to.eql('myid');
+          });
+      });
     });
 
-    it('saves all keys', function () {
-      var s = new Subscription();
-
-      s.path = 'foo';
-      s.params.bar = 'baz';
-      s.key = '42';
-
-      return s.save()
-        .then(function () {
-          expect(t.hmset).to.have.been.calledOnce;
-
-          var call = t.hmset.getCall(0);
-
-          expect(call.args).to.have.length(2);
-          expect(call.args[1]).to.have.length(Subscription.keys.length * 2);
-          expect(call.args[0]).to.equal(call.args[1][1]);
-          expect(call.args[1].slice(2, 8)).to.eql([
-            'url', 'foo?bar=baz', 'key', '42', 'version', 0
-          ]);
-        });
-    });
-
-    describe('for new subscriptions', function () {
-      it('generates a new id', function () {
-        var s = new Subscription({});
+    describe('#save', function () {
+      it('returns a promise for the saved subscription', function () {
+        var s = new Subscription({ url: 'foo' });
 
         return expect(s.save())
           .to.eventually.be.fulfilled
           .and.equal(s)
-          .and.have.property('id')
-          .and.match(/^[\da-z]{10}$/);
+          .and.have.property('url', 'foo');
       });
-    });
 
-    describe('for existing subscriptions', function () {
-      it('does not alter the id', function () {
-        return expect((new Subscription({ id: 'foo' })).save())
-          .to.eventually.be.fulfilled
-          .and.have.property('id', 'foo');
+      it('saves all keys', function () {
+        var s = new Subscription();
+
+        s.path = 'foo';
+        s.params.bar = 'baz';
+        s.key = '42';
+
+        return s.save()
+          .then(function () {
+            expect(t.hmset).to.have.been.calledOnce;
+
+            var call = t.hmset.getCall(0);
+
+            expect(call.args).to.have.length(2);
+            expect(call.args[1]).to.have.length(Subscription.keys.length * 2);
+            expect(call.args[0]).to.equal(call.args[1][1]);
+            expect(call.args[1].slice(2, 8)).to.eql([
+              'url', 'foo?bar=baz', 'key', '42', 'version', 0
+            ]);
+          });
+      });
+
+      describe('for new subscriptions', function () {
+        it('generates a new id', function () {
+          var s = new Subscription({});
+
+          return expect(s.save())
+            .to.eventually.be.fulfilled
+            .and.equal(s)
+            .and.have.property('id')
+            .and.match(/^[\da-z]{10}$/);
+        });
+      });
+
+      describe('for existing subscriptions', function () {
+        it('does not alter the id', function () {
+          return expect((new Subscription({ id: 'foo' })).save())
+            .to.eventually.be.fulfilled
+            .and.have.property('id', 'foo');
+        });
       });
     });
   });

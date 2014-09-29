@@ -300,7 +300,15 @@ describe('Session', function () {
     });
 
     describe('when an error occurs', function () {
+      beforeEach(function () {
+        session.update.restore();
+        sinon.stub(session, 'update', function () {
+          return delayed().then(function () { throw  new Error('failed'); });
+        });
+      });
+
       it('fails', function () {
+        return expect(session.execute()).to.eventually.be.rejected;
       });
     });
   });

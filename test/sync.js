@@ -316,27 +316,6 @@ describe('Session', function () {
   });
 
   describe('#update', function () {
-    function FakeMessage(version, more, interrupt) {
-      this.version   = version || 1;
-      this.more      = more || 0;
-      this.done      = this.more < 1;
-      this.interrupt = interrupt;
-
-      this.multi    = true;
-      this.modified = true;
-      this.type = 'json';
-
-      this.data = {};
-    }
-
-    FakeMessage.prototype.next = function () {
-      var m = this.interrupt ?
-        new FakeMessage(++this.version, --this.more) :
-        new FakeMessage(this.version, --this.more);
-
-      return delayed().then(function () { return m; });
-    };
-
     beforeEach(function () {
       session = new Session(new Subscription({
         url: '/users/23/items'
@@ -447,6 +426,60 @@ describe('Session', function () {
     });
   });
 
+  describe('#download', function () {
+    beforeEach(function () {
+      session = new Session(new Subscription({
+        url: '/users/23/collection/x/items'
+      }));
+
+      session.versions = { foo: 1, bar: 1, baz: 1 };
+
+      session.created = ['bar'];
+      session.updated = ['foo', 'baz'];
+
+      sinon.stub(session, 'get', function (_, options) {
+        var m = new FakeMessage(1);
+
+        if (options.itemKey) {
+          m.data = options.itemKey.split(',').map(function (key) {
+            return { key: key, version: 1 };
+          });
+        }
+
+        return delayed().then(function () { return m; });
+      });
+    });
+
+    it('downloads all created/updated items', function () {
+      return expect(session.download())
+        .to.eventually.have.property('items')
+        .and.to.have.keys(['foo', 'bar', 'baz']);
+    });
+
+    it('skips up-to-date items', function () {
+      session.versions.foo = 0;
+      session.items.foo = { version: 0 };
+
+      return expect(session.download())
+        .to.eventually.have.property('items')
+        .and.to.have.keys(['foo', 'bar', 'baz'])
+        .and.to.have.deep.property('foo.version', 0);
+    });
+
+    it('calls get with format=json and item keys', function () {
+      return session.download()
+        .then(function () {
+          expect(session.get).to.have.been.called;
+          expect(session.get.args[0][0]).to.eql('/users/23/items');
+          expect(session.get.args[0][1]).to.have.property('format', 'json');
+
+          expect(session.get.args[0][1])
+            .to.have.property('itemKey')
+            .and.to.match(/^(\w+,){2}\w+$/);
+        });
+    });
+  });
+
   describe('#get', function () {
     beforeEach(function () {
       sinon.stub(sync.zotero, 'get');
@@ -519,4 +552,27 @@ describe('Session', function () {
       expect(session.deleted).to.empty;
     });
   });
+
+  // --- Test Helpers ---
+
+  function FakeMessage(version, more, interrupt) {
+    this.version   = version || 1;
+    this.more      = more || 0;
+    this.done      = this.more < 1;
+    this.interrupt = interrupt;
+
+    this.multi    = true;
+    this.modified = true;
+    this.type = 'json';
+
+    this.data = {};
+  }
+
+  FakeMessage.prototype.next = function () {
+    var m = this.interrupt ?
+      new FakeMessage(++this.version, --this.more) :
+      new FakeMessage(this.version, --this.more);
+
+    return delayed().then(function () { return m; });
+  };
 });

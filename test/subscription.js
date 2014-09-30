@@ -33,6 +33,16 @@ describe('Subscription', function () {
     });
   });
 
+  describe('#json', function () {
+    it('returns an object', function () {
+      expect((new Subscription()).json).to.be.an('object');
+    });
+
+    it('contains empty keys', function () {
+      expect((new Subscription()).json).to.not.be.empty;
+    });
+  });
+
   describe('#touch', function () {
     it('updates the timestamp', function (done) {
       var a, s = new Subscription();

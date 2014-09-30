@@ -5,14 +5,15 @@
 
 require('gnode');
 
-var debug    = require('debug')('arkivo');
-//var B       = require('B');
+var debug   = require('debug')('arkivo');
+var B       = require('bluebird');
 var program = require('commander');
 var tabtab  = require('tabtab');
 
 var arkivo  = require('..');
 
 var controller = arkivo.controller;
+var server     = arkivo.server;
 
 program
   .version(arkivo.version)
@@ -27,13 +28,19 @@ program
 
   .action(function up() {
 
-    controller.start();
+    B.all([
+      controller.start(),
+      server.start()
+    ]);
 
     process.once('SIGINT', function () {
       debug('sigterm received: shutting down...');
 
-      controller
-        .stop()
+      B.all([
+          controller.stop(),
+          server.stop()
+        ])
+
         .then(quit) // Can be removed with next Kue version
 
         .catch(function (e) {

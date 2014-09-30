@@ -1,6 +1,6 @@
 BIN = ./node_modules/.bin
 
-SRC = lib/*.js lib/ui/*.js lib/plugins/*.js
+SRC = lib/*.js lib/http/*.js lib/plugins/*.js
 TEST = test/*.js test/plugins/*.js
 
 doc:

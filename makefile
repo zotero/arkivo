@@ -1,7 +1,7 @@
 BIN = ./node_modules/.bin
 
-SRC = lib/*.js lib/http/*.js lib/plugins/*.js
-TEST = test/*.js test/plugins/*.js
+SRC = lib/*.js lib/**/*.js
+TEST = test/*.js test/**/*.js
 
 doc:
 	${BIN}/yuidoc .

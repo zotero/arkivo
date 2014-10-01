@@ -302,9 +302,9 @@ describe('Subscription', function () {
 
     beforeEach(function () {
       t = {
-        sadd: chainspy(),
+        zadd: chainspy(),
         hmset: chainspy(),
-        srem: chainspy(),
+        zrem: chainspy(),
         del: chainspy(),
         commit: B.fulfilled.bind(B)
       };
@@ -333,8 +333,8 @@ describe('Subscription', function () {
         return (new Subscription({ id: 'myid' }))
           .destroy()
           .then(function () {
-            expect(t.srem.args[0][0]).to.eql('ids');
-            expect(t.srem.args[0][1]).to.eql('myid');
+            expect(t.zrem.args[0][0]).to.eql('ids');
+            expect(t.zrem.args[0][1]).to.eql('myid');
             expect(t.del.args[0][0]).to.eql('myid');
           });
       });
@@ -400,15 +400,15 @@ describe('Subscription', function () {
     beforeEach(function () {
       var called = 0;
 
-      sinon.stub(db, 'sismember', function () {
+      sinon.stub(db, 'zscore', function () {
         return B.fulfilled().then(function () {
-          return (called++ < COLLISIONS);
+          return (called++ < COLLISIONS) ? 0 : null;
         });
       });
     });
 
     afterEach(function () {
-      db.sismember.restore();
+      db.zscore.restore();
     });
 
     it('returns a promise for the subscription with an id', function () {
@@ -421,7 +421,7 @@ describe('Subscription', function () {
 
     it('sets a unique id', function () {
       return (new Subscription()).identify().then(function () {
-        expect(db.sismember.callCount).to.equal(COLLISIONS + 1);
+        expect(db.zscore.callCount).to.equal(COLLISIONS + 1);
       });
     });
 
@@ -435,7 +435,7 @@ describe('Subscription', function () {
 
   describe('.all', function () {
     beforeEach(function () {
-      sinon.stub(db, 'smembers', function () {
+      sinon.stub(db, 'zrange', function () {
         return B.fulfilled(['foo', 'bar', 'baz']);
       });
 
@@ -445,7 +445,7 @@ describe('Subscription', function () {
     });
 
     afterEach(function () {
-      db.smembers.restore();
+      db.zrange.restore();
       Subscription.load.restore();
     });
 

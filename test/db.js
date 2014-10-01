@@ -12,7 +12,7 @@ describe('db', function () {
 
   before(function () {
     sinon.stub(redis, 'createClient', function () {
-      return { on: sinon.spy(), saddAsync: sinon.spy(), delAsync: sinon.spy() };
+      return { on: sinon.spy(), zaddAsync: sinon.spy(), delAsync: sinon.spy() };
     });
   });
 
@@ -56,23 +56,23 @@ describe('db', function () {
     beforeEach(function () { database = db('ns'); });
 
     it('namespace the first argument', function () {
-      database.sadd('foo');
-      expect(database.client.saddAsync).to.have.been.calledWith('ns:foo');
+      database.zadd('foo');
+      expect(database.client.zaddAsync).to.have.been.calledWith('ns:foo');
     });
 
     it('fail if less than one argument is given', function () {
-      expect(function () { database.sadd(); }).to.throw(Error);
+      expect(function () { database.zadd(); }).to.throw(Error);
     });
 
     it('pass on the remaining arguments as is', function () {
-      database.sadd('foo', 'bar', 'baz');
-      expect(database.client.saddAsync)
+      database.zadd('foo', 'bar', 'baz');
+      expect(database.client.zaddAsync)
         .to.have.been.calledWith('ns:foo', 'bar', 'baz');
     });
 
     it('does not mess with the callback', function () {
-      database.sadd('foo', noop);
-      expect(database.client.saddAsync).to.have.been.calledWith('ns:foo', noop);
+      database.zadd('foo', noop);
+      expect(database.client.zaddAsync).to.have.been.calledWith('ns:foo', noop);
     });
   });
 
@@ -112,7 +112,7 @@ describe('db', function () {
       database.client.multi = sinon.spy(function () {
         return {
           execAsync: sinon.spy(function () { return 'exec'; }),
-          sadd: sinon.spy(function () { return this; })
+          zadd: sinon.spy(function () { return this; })
         };
       });
     });
@@ -133,28 +133,28 @@ describe('db', function () {
       beforeEach(function () { transaction = database.transaction(); });
 
       it('are forwarded to the multi object', function () {
-        expect(transaction.multi.sadd).to.not.have.been.called;
-        transaction.sadd('foo');
-        expect(transaction.multi.sadd).to.have.been.called;
+        expect(transaction.multi.zadd).to.not.have.been.called;
+        transaction.zadd('foo');
+        expect(transaction.multi.zadd).to.have.been.called;
       });
 
       it('namespace the first argument', function () {
-        transaction.sadd('foo', 'bar');
+        transaction.zadd('foo', 'bar');
 
-        expect(transaction.multi.sadd)
+        expect(transaction.multi.zadd)
           .to.have.been.calledWith('ns:foo', 'bar');
       });
 
       it('can be chained if target returns itself', function () {
-        expect(transaction.sadd('foo')).to.be.equal(transaction);
+        expect(transaction.zadd('foo')).to.be.equal(transaction);
 
-        transaction.sadd('bar').sadd('baz');
+        transaction.zadd('bar').zadd('baz');
 
-        expect(transaction.multi.sadd).to.have.been.calledThrice;
+        expect(transaction.multi.zadd).to.have.been.calledThrice;
 
-        expect(transaction.multi.sadd).to.have.been.calledWith('ns:foo');
-        expect(transaction.multi.sadd).to.have.been.calledWith('ns:bar');
-        expect(transaction.multi.sadd).to.have.been.calledWith('ns:baz');
+        expect(transaction.multi.zadd).to.have.been.calledWith('ns:foo');
+        expect(transaction.multi.zadd).to.have.been.calledWith('ns:bar');
+        expect(transaction.multi.zadd).to.have.been.calledWith('ns:baz');
       });
     });
 
@@ -163,13 +163,13 @@ describe('db', function () {
         var transaction = database.transaction();
 
         expect(
-          transaction.sadd('foo').sadd('bar').commit()
+          transaction.zadd('foo').zadd('bar').commit()
         ).to.eql('exec');
 
-        expect(transaction.multi.sadd).to.have.been.calledTwice;
+        expect(transaction.multi.zadd).to.have.been.calledTwice;
 
-        expect(transaction.multi.sadd).to.have.been.calledWith('ns:foo');
-        expect(transaction.multi.sadd).to.have.been.calledWith('ns:bar');
+        expect(transaction.multi.zadd).to.have.been.calledWith('ns:foo');
+        expect(transaction.multi.zadd).to.have.been.calledWith('ns:bar');
 
         expect(transaction.multi.execAsync).to.have.been.calledOnce;
       });

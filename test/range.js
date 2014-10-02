@@ -10,7 +10,7 @@ describe('Range', function () {
     expect(Range).to.be.a('function');
   });
 
-  it('by default', function () {
+  describe('by default', function () {
     beforeEach(function () { range = new Range(); });
 
     it('is infinite', function () {
@@ -19,6 +19,10 @@ describe('Range', function () {
 
     it('is valid', function () {
       expect(range.valid).to.be.true;
+    });
+
+    it('is done', function () {
+      expect(range.done).to.be.true;
     });
 
     it('starts at 0 and has no limit', function () {
@@ -30,13 +34,17 @@ describe('Range', function () {
   });
 
   describe('when infinite', function () {
-    it('works with to/from input', function () {
+    it('works with positive to/from input', function () {
       range = new Range(1, 3);
 
       expect(range.array).to.eql([1, 3]);
       expect(range.start).to.eql(1);
-
       expect(range.limit).to.eql(2);
+
+      expect(range.total).to.be.undefined;
+      expect(range.finite).to.be.false;
+      expect(range.done).to.be.false;
+
     });
   });
 

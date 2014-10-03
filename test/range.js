@@ -53,16 +53,38 @@ describe('Range', function () {
 
       expect(range.next().bounds).to.eql([4, 6]);
       expect(range.prev().bounds).to.eql([0, 2]);
+      expect(range.prev().prev()).to.be.null;
 
-      range.total = 9;
-      expect(range.next().next().bounds).to.eql([7, 8]);
-      expect(range.next().next().next()).to.be.null;
-
-      range.total = 8;
-      //expect(range.prev().bounds).to.eql([0, 2]);
+      expect(range.next().prev().bounds).to.eql([1, 3]);
+      expect(range.next().next().bounds).to.eql([7, 9]);
     });
   });
 
   describe('when finite', function () {
+    it('works with positive start/limit input', function () {
+      range = new Range(1, 3, 9);
+
+      expect(range.start).to.eql(1);
+      expect(range.limit).to.eql(3);
+      expect(range.total).to.eql(9);
+
+      expect(range.bounds).to.eql([1, 3]);
+
+      expect(range.finite).to.be.true;
+      expect(range.open).to.be.false;
+      expect(range.done).to.be.false;
+
+      expect(range.next().bounds).to.eql([4, 6]);
+      expect(range.prev().bounds).to.eql([0, 2]);
+      expect(range.prev().prev()).to.be.null;
+
+      expect(range.next().prev().bounds).to.eql([1, 3]);
+
+      expect(range.next().next().bounds).to.eql([7, 8]);
+      expect(range.next().next().next()).to.be.null;
+
+      range.total = 8;
+      expect(range.next().next().bounds).to.eql([7, 7]);
+    });
   });
 });

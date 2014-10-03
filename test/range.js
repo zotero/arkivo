@@ -25,26 +25,34 @@ describe('Range', function () {
       expect(range.done).to.be.true;
     });
 
+    it('is open', function () {
+      expect(range.open).to.be.true;
+    });
+
     it('starts at 0 and has no limit', function () {
       expect(range.start).to.equal(0);
       expect(range.limit).to.be.undefined;
 
-      expect(range.params).to.have.keys(['start']);
+      expect(range.query).to.have.keys(['start']);
     });
   });
 
   describe('when infinite', function () {
-    it('works with positive to/from input', function () {
+    it('works with positive start/limit input', function () {
       range = new Range(1, 3);
 
-      expect(range.array).to.eql([1, 3]);
       expect(range.start).to.eql(1);
-      expect(range.limit).to.eql(2);
+      expect(range.limit).to.eql(3);
+
+      expect(range.bounds).to.eql([1, 3]);
 
       expect(range.total).to.be.undefined;
       expect(range.finite).to.be.false;
+      expect(range.open).to.be.false;
       expect(range.done).to.be.false;
 
+      //expect(range.next().bounds).to.eql([4, 6]);
+      //expect(range.prev().bounds).to.eql([0, 2]);
     });
   });
 

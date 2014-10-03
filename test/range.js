@@ -51,7 +51,15 @@ describe('Range', function () {
       expect(range.open).to.be.false;
       expect(range.done).to.be.false;
 
-      //expect(range.next().bounds).to.eql([4, 6]);
+      expect(range.next().bounds).to.eql([4, 6]);
+
+      range.total = 9;
+      expect(range.next().next().bounds).to.eql([7, 8]);
+      //expect(range.last().bounds).to.eql([7, 8]);
+      expect(range.next().next().next()).to.be.null;
+
+      range.total = 8;
+      //expect(range.last().bounds).to.eql([7, 7]);
       //expect(range.prev().bounds).to.eql([0, 2]);
     });
   });

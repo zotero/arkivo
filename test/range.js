@@ -6,13 +6,32 @@ var Range = require('../lib/range');
 describe('Range', function () {
   var range;
 
+  beforeEach(function () { range = new Range(); });
+
   it('is a function', function () {
     expect(Range).to.be.a('function');
   });
 
-  describe('by default', function () {
-    beforeEach(function () { range = new Range(); });
+  describe('.parse', function () {
+    it('returns a new range by default', function () {
+      expect(Range.parse()).to.be.instanceof(Range);
+    });
 
+    it('returns ranges untouched', function () {
+      expect(Range.parse(range)).to.equal(range);
+    });
+
+    it('creates a new range from options', function () {
+      expect(Range.parse({ start: 42 }).start).to.eql(42);
+    });
+
+    it('validates new ranges', function () {
+      expect(Range.parse.bind(Range, { start: 42, total: 40 }))
+        .to.throw(RangeError);
+    });
+  });
+
+  describe('by default', function () {
     it('is infinite', function () {
       expect(range.finite).to.be.false;
     });

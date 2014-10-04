@@ -29,6 +29,16 @@ describe('Range', function () {
       expect(range.open).to.be.true;
     });
 
+    it('has no next and previous', function () {
+      expect(range.next()).to.be.null;
+      expect(range.prev()).to.be.null;
+    });
+
+    it('is the first and last', function () {
+      expect(range.first()).to.equal(range);
+      expect(range.last()).to.equal(range);
+    });
+
     it('starts at 0 and has no limit', function () {
       expect(range.start).to.equal(0);
       expect(range.limit).to.be.undefined;
@@ -57,6 +67,12 @@ describe('Range', function () {
 
       expect(range.next().prev().bounds).to.eql([1, 3]);
       expect(range.next().next().bounds).to.eql([7, 9]);
+
+      expect(range.first().bounds).to.eql([0, 2]);
+
+      expect(range.last().bounds).to.eql([-3, -1]);
+      expect(range.last().prev().bounds).to.eql([-6, -4]);
+      expect(range.last().prev().next().bounds).to.eql([-3, -1]);
     });
   });
 
@@ -83,8 +99,14 @@ describe('Range', function () {
       expect(range.next().next().bounds).to.eql([7, 8]);
       expect(range.next().next().next()).to.be.null;
 
+      expect(range.first().bounds).to.eql([0, 2]);
+
+      expect(range.last().bounds).to.eql([6, 8]);
+      expect(range.last().done).to.be.true;
+
       range.total = 8;
       expect(range.next().next().bounds).to.eql([7, 7]);
+      expect(range.last().bounds).to.eql([5, 7]);
     });
   });
 });

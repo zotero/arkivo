@@ -17,14 +17,17 @@ describe('API', function () {
   before(function () { api = server.initialize().app; });
 
   beforeEach(function () {
-    ids = [];
+    ids = ['foo', 'bar', 'baz'];
 
     sinon.stub(Subscription, 'ids', function () {
       return B.delay(0).return(ids);
     });
 
     sinon.stub(Subscription, 'load', function (id) {
-      return B.delay(0).return(new Subscription({ id: id }));
+      if (ids.indexOf(id) >= 0)
+        return B.delay(0).return(new Subscription({ id: id }));
+
+      return B.delay(0).throw(new Subscription.NotFoundError('not found'));
     });
   });
 
@@ -34,8 +37,6 @@ describe('API', function () {
   });
 
   describe('GET /api/subscription', function () {
-    beforeEach(function () { ids = ['foo', 'bar', 'baz']; });
-
     it('loads the first page of subscriptions', function (done) {
       chai.request(api)
         .get('/api/subscription')
@@ -50,7 +51,7 @@ describe('API', function () {
 
           expect(Subscription.load).to.have.been.calledThrice;
 
-          expect(res.body).to.have.length(3);
+          expect(res.body).to.have.length(ids.length);
           expect(res.body[0]).to.have.keys(['id', 'url', 'version']);
 
           done();
@@ -59,5 +60,44 @@ describe('API', function () {
 
     it('sets the total header and next/prev links', function () {
     });
+  });
+
+  describe('GET /api/subscription/:id', function () {
+
+    describe('when the id exists', function () {
+      it('returns the subscrption', function (done) {
+        chai.request(api)
+          .get('/api/subscription/foo')
+
+          .res(function (res) {
+            expect(res)
+              .to.have.status(200)
+              .and.to.be.json;
+
+            expect(res.body).to.have.property('id', 'foo');
+            expect(res.body).to.have.keys(['id', 'url', 'version']);
+
+            done();
+          });
+      });
+    });
+
+    describe('when the id does not exists', function () {
+      it('returns a 404', function (done) {
+        chai.request(api)
+          .get('/api/subscription/needle')
+          .res(function (res) {
+
+            expect(res)
+              .to.have.status(404)
+              .and.to.be.json;
+
+            expect(res.body).to.have.property('error');
+
+            done();
+          });
+      });
+    });
+
   });
 });

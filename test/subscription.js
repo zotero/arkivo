@@ -47,7 +47,7 @@ describe('Subscription', function () {
     it('updates the timestamp', function (done) {
       var a, s = new Subscription();
 
-      expect(s.timestamp).to.be.null;
+      expect(s.timestamp).to.be.undefined;
 
       s.touch();
       a = s.timestamp;

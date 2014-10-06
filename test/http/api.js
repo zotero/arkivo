@@ -34,15 +34,24 @@ describe('API', function () {
   });
 
   describe('GET /api/subscription', function () {
+    beforeEach(function () { ids = ['foo', 'bar', 'baz']; });
+
     it('loads the first page of subscriptions', function (done) {
       chai.request(api)
         .get('/api/subscription')
 
         .res(function (res) {
-          expect(res).to.have.status(200);
+          expect(res)
+            .to.have.status(200)
+            .and.to.be.json;
 
           expect(Subscription.ids)
             .to.have.been.calledWith({ start: 0, limit: 50 });
+
+          expect(Subscription.load).to.have.been.calledThrice;
+
+          expect(res.body).to.have.length(3);
+          expect(res.body[0]).to.have.keys(['id', 'url', 'version']);
 
           done();
         });

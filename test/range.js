@@ -99,6 +99,8 @@ describe('Range', function () {
     it('works with positive start/limit input', function () {
       range = new Range(1, 3, 9);
 
+      expect(range.valid).to.be.true;
+
       expect(range.start).to.eql(1);
       expect(range.limit).to.eql(3);
       expect(range.total).to.eql(9);
@@ -123,7 +125,10 @@ describe('Range', function () {
       expect(range.last().bounds).to.eql([6, 8]);
       expect(range.last().done).to.be.true;
 
-      range.total = 8;
+      range = new Range([1, 3, 8]);
+
+      expect(range.valid).to.be.true;
+
       expect(range.next().next().bounds).to.eql([7, 7]);
       expect(range.last().bounds).to.eql([5, 7]);
     });

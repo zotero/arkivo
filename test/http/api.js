@@ -36,6 +36,7 @@ describe('API', function () {
 
     sinon.stub(Subscription.prototype, 'save', function () {
       var self = this;
+      self.id = 'id';
       return B.delay(0).return(self);
     });
   });
@@ -102,9 +103,24 @@ describe('API', function () {
 
   describe('POST /api/subscription', function () {
     it('creates a new subscription from the request body', function () {
-    });
+      expect(Subscription.prototype.save).to.not.have.been.called;
 
-    it('returns a location header and the new subscription', function () {
+      chai.request(api)
+        .post('/api/subscription')
+
+        .req(function (req) {
+          req.send({ url: '/users/7/items', key: 'foo' });
+        })
+
+        .res(function (res) {
+          expect(res)
+            .to.have.status(201)
+            .and.to.be.json
+            .and.to.have.header('location', '/api/subscription/id');
+
+          expect(res.body).to.have.property('url', '/users/7/items');
+          expect(res.body).to.have.property('key', 'foo');
+        });
     });
 
     it('creates a new subscription from url params', function () {

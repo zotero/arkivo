@@ -36,6 +36,10 @@ describe('API', function () {
 
     sinon.stub(Subscription.prototype, 'save', function () {
       var self = this;
+
+      if (!this.url)
+        return B.delay(0).throw(new Subscription.ValidationError('no url'));
+
       self.id = 'id';
       return B.delay(0).return(self);
     });
@@ -144,7 +148,17 @@ describe('API', function () {
         });
     });
 
-    it('fails if there is insufficient input', function () {
+    it('fails if there is insufficient input', function (done) {
+      chai.request(api)
+        .post('/api/subscription?key=bar')
+
+        .res(function (res) {
+          expect(res)
+            .to.have.status(400)
+            .and.to.be.json;
+
+          done();
+        });
     });
   });
 

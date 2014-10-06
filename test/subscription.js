@@ -374,7 +374,7 @@ describe('Subscription', function () {
 
       describe('for new subscriptions', function () {
         it('generates a new id', function () {
-          var s = new Subscription({});
+          var s = new Subscription({ url: 'bar' });
 
           return expect(s.save())
             .to.eventually.be.fulfilled
@@ -386,7 +386,7 @@ describe('Subscription', function () {
 
       describe('for existing subscriptions', function () {
         it('does not alter the id', function () {
-          return expect((new Subscription({ id: 'foo' })).save())
+          return expect((new Subscription({ id: 'foo', url: 'foo' })).save())
             .to.eventually.be.fulfilled
             .and.have.property('id', 'foo');
         });

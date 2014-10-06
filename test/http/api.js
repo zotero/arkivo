@@ -102,9 +102,7 @@ describe('API', function () {
   });
 
   describe('POST /api/subscription', function () {
-    it('creates a new subscription from the request body', function () {
-      expect(Subscription.prototype.save).to.not.have.been.called;
-
+    it('creates a new subscription from the request body', function (done) {
       chai.request(api)
         .post('/api/subscription')
 
@@ -120,10 +118,30 @@ describe('API', function () {
 
           expect(res.body).to.have.property('url', '/users/7/items');
           expect(res.body).to.have.property('key', 'foo');
+
+          done();
         });
     });
 
-    it('creates a new subscription from url params', function () {
+    it('creates a new subscription from url params', function (done) {
+      chai.request(api)
+        .post('/api/subscription?url=/users/8/items&key=bar')
+
+        .req(function (req) {
+          req.send({ key: 'foo' });
+        })
+
+        .res(function (res) {
+          expect(res)
+            .to.have.status(201)
+            .and.to.be.json
+            .and.to.have.header('location', '/api/subscription/id');
+
+          expect(res.body).to.have.property('url', '/users/8/items');
+          expect(res.body).to.have.property('key', 'foo');
+
+          done();
+        });
     });
 
     it('fails if there is insufficient input', function () {

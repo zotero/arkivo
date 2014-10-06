@@ -28,6 +28,9 @@ describe('Range', function () {
     it('validates new ranges', function () {
       expect(Range.parse.bind(Range, { start: 42, total: 40 }))
         .to.throw(RangeError);
+
+      expect(Range.parse.bind(Range, { limit: '-5' }))
+        .to.throw(RangeError);
     });
   });
 

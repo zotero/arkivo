@@ -9,6 +9,7 @@ var B = require('bluebird');
 
 var server = require('../../lib/http').singleton;
 
+var Range        = require('../../lib/range');
 var Subscription = require('../../lib/subscription');
 
 describe('API', function () {
@@ -19,8 +20,11 @@ describe('API', function () {
   beforeEach(function () {
     ids = ['foo', 'bar', 'baz'];
 
-    sinon.stub(Subscription, 'ids', function () {
-      return B.delay(0).return(ids);
+    sinon.stub(Subscription, 'ids', function (options) {
+      return B.delay(0).then(function () {
+        Range.parse(options);
+        return ids;
+      });
     });
 
     sinon.stub(Subscription, 'load', function (id) {
@@ -29,11 +33,17 @@ describe('API', function () {
 
       return B.delay(0).throw(new Subscription.NotFoundError('not found'));
     });
+
+    sinon.stub(Subscription.prototype, 'save', function () {
+      var self = this;
+      return B.delay(0).return(self);
+    });
   });
 
   afterEach(function () {
     Subscription.ids.restore();
     Subscription.load.restore();
+    Subscription.prototype.save.restore();
   });
 
   describe('GET /api/subscription', function () {
@@ -60,10 +70,51 @@ describe('API', function () {
 
     it('sets the total header and next/prev links', function () {
     });
+
+    it('utilizes range params', function (done) {
+      chai.request(api)
+        .get('/api/subscription?start=10&limit=5')
+        .res(function (res) {
+          expect(res)
+            .to.have.status(200)
+            .and.to.be.json;
+
+          expect(Subscription.ids)
+            .to.have.been.calledWith({ start: '10', limit: '5' });
+
+          done();
+        });
+    });
+
+    it('returns 400 for bad ranges', function (done) {
+      chai.request(api)
+        .get('/api/subscription?limit=-5')
+        .res(function (res) {
+          expect(res)
+            .to.have.status(400)
+            .and.to.be.json
+            .and.to.have.deep.property('body.error');
+
+          done();
+        });
+    });
+  });
+
+  describe('POST /api/subscription', function () {
+    it('creates a new subscription from the request body', function () {
+    });
+
+    it('returns a location header and the new subscription', function () {
+    });
+
+    it('creates a new subscription from url params', function () {
+    });
+
+    it('fails if there is insufficient input', function () {
+    });
   });
 
   describe('GET /api/subscription/:id', function () {
-
     describe('when the id exists', function () {
       it('returns the subscrption', function (done) {
         chai.request(api)
@@ -98,6 +149,6 @@ describe('API', function () {
           });
       });
     });
-
   });
+
 });

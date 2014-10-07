@@ -9,8 +9,11 @@ var B = require('bluebird');
 
 var server = require('../../lib/http').singleton;
 
-var Range        = require('../../lib/range');
+//var Range        = require('../../lib/range');
 var Subscription = require('../../lib/subscription');
+
+var defaults = require('../../lib/defaults');
+var db = require('../../lib/db')(defaults.subscription.prefix);
 
 describe('API', function () {
   var api, ids;
@@ -20,32 +23,38 @@ describe('API', function () {
   beforeEach(function () {
     ids = ['foo', 'bar', 'baz'];
 
-    sinon.stub(Subscription, 'ids', function (options) {
-      return B.delay(0).then(function () {
-        Range.parse(options);
-        return ids;
-      });
+    sinon.stub(db, 'zcard', function () {
+      return B.fulfilled(ids.length);
     });
+
+    sinon.stub(db, 'zrange', function () {
+      return B.fulfilled(ids);
+    });
+
+    sinon.spy(Subscription, 'ids');
 
     sinon.stub(Subscription, 'load', function (id) {
       if (ids.indexOf(id) >= 0)
-        return B.delay(0).return(new Subscription({ id: id }));
+        return B.fulfilled(new Subscription({ id: id }));
 
-      return B.delay(0).throw(new Subscription.NotFoundError('not found'));
+      return B.rejected(new Subscription.NotFoundError('not found'));
     });
 
     sinon.stub(Subscription.prototype, 'save', function () {
       var self = this;
 
       if (!this.url)
-        return B.delay(0).throw(new Subscription.ValidationError('no url'));
+        return B.rejected(new Subscription.ValidationError('no url'));
 
       self.id = 'id';
-      return B.delay(0).return(self);
+      return B.fulfilled(self);
     });
   });
 
   afterEach(function () {
+    db.zrange.restore();
+    db.zcard.restore();
+
     Subscription.ids.restore();
     Subscription.load.restore();
     Subscription.prototype.save.restore();
@@ -78,14 +87,14 @@ describe('API', function () {
 
     it('utilizes range params', function (done) {
       chai.request(api)
-        .get('/api/subscription?start=10&limit=5')
+        .get('/api/subscription?start=1&limit=5')
         .res(function (res) {
           expect(res)
             .to.have.status(200)
             .and.to.be.json;
 
           expect(Subscription.ids)
-            .to.have.been.calledWith({ start: '10', limit: '5' });
+            .to.have.been.calledWith({ start: '1', limit: '5' });
 
           done();
         });

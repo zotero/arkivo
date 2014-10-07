@@ -434,9 +434,17 @@ describe('Subscription', function () {
   });
 
   describe('range loading', function () {
+    var ids;
+
     beforeEach(function () {
+      ids = ['foo', 'bar', 'baz'];
+
+      sinon.stub(db, 'zcard', function () {
+        return B.fulfilled(ids.length);
+      });
+
       sinon.stub(db, 'zrange', function () {
-        return B.fulfilled(['foo', 'bar', 'baz']);
+        return B.fulfilled(ids);
       });
 
       sinon.stub(Subscription, 'load', function () {
@@ -446,6 +454,7 @@ describe('Subscription', function () {
 
     afterEach(function () {
       db.zrange.restore();
+      db.zcard.restore();
       Subscription.load.restore();
     });
 

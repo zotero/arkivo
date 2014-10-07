@@ -82,7 +82,21 @@ describe('API', function () {
         });
     });
 
-    it('sets the total header and next/prev links', function () {
+    it('sets the total header and next/prev links', function (done) {
+      chai.request(api)
+        .get('/api/subscription?limit=2')
+        .res(function (res) {
+          expect(res)
+            .to.have.status(200)
+            .and.to.have.header('total-results', '3')
+            .and.to.have.header('link');
+
+          expect(res.headers.link)
+            .to.match(/\/api\/subscription\?start=2&limit=2>; rel="next"/)
+            .and.match(/\/api\/subscription\?start=1&limit=2>; rel="last"/);
+
+          done();
+        });
     });
 
     it('utilizes range params', function (done) {

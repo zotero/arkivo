@@ -433,7 +433,7 @@ describe('Subscription', function () {
     });
   });
 
-  describe('.all', function () {
+  describe('range loading', function () {
     beforeEach(function () {
       sinon.stub(db, 'zrange', function () {
         return B.fulfilled(['foo', 'bar', 'baz']);
@@ -449,15 +449,28 @@ describe('Subscription', function () {
       Subscription.load.restore();
     });
 
-    it('loads all subscriptions', function () {
-      return Subscription.all().then(function (s) {
-        expect(s).to.have.length(3);
-        expect(s[0]).to.be.instanceof(Subscription);
-        expect(Subscription.load).to.have.been.calledTrice;
+    describe('.ids', function () {
+      it('loads all subscription ids', function () {
+        return Subscription.ids().then(function (s) {
+          expect(s).to.have.length(3);
+          expect(s).to.be.instanceof(Array);
+          expect(s).to.have.property('range');
+        });
+      });
+    });
 
-        expect(Subscription.load).to.have.been.calledWith('foo');
-        expect(Subscription.load).to.have.been.calledWith('bar');
-        expect(Subscription.load).to.have.been.calledWith('baz');
+    describe('.all', function () {
+      it('loads all subscriptions', function () {
+        return Subscription.all().then(function (s) {
+          expect(s).to.have.length(3);
+          expect(s[0]).to.be.instanceof(Subscription);
+          expect(Subscription.load).to.have.been.calledTrice;
+
+          expect(s).to.have.property('range');
+          expect(Subscription.load).to.have.been.calledWith('foo');
+          expect(Subscription.load).to.have.been.calledWith('bar');
+          expect(Subscription.load).to.have.been.calledWith('baz');
+        });
       });
     });
   });

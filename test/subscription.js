@@ -342,18 +342,18 @@ describe('Subscription', function () {
 
     describe('#save', function () {
       it('returns a promise for the saved subscription', function () {
-        var s = new Subscription({ url: 'foo' });
+        var s = new Subscription({ url: 'users/123' });
 
         return expect(s.save())
           .to.eventually.be.fulfilled
           .and.equal(s)
-          .and.have.property('url', 'foo');
+          .and.have.property('url', 'users/123');
       });
 
       it('saves all keys', function () {
         var s = new Subscription();
 
-        s.path = 'foo';
+        s.path = '/users/123';
         s.params.bar = 'baz';
         s.key = '42';
 
@@ -367,14 +367,14 @@ describe('Subscription', function () {
             expect(call.args[1]).to.have.length(Subscription.keys.length * 2);
             expect(call.args[0]).to.equal(call.args[1][1]);
             expect(call.args[1].slice(2, 8)).to.eql([
-              'url', 'foo?bar=baz', 'key', '42', 'version', 0
+              'url', '/users/123?bar=baz', 'key', '42', 'version', 0
             ]);
           });
       });
 
       describe('for new subscriptions', function () {
         it('generates a new id', function () {
-          var s = new Subscription({ url: 'bar' });
+          var s = new Subscription({ url: '/groups/42' });
 
           return expect(s.save())
             .to.eventually.be.fulfilled
@@ -386,7 +386,9 @@ describe('Subscription', function () {
 
       describe('for existing subscriptions', function () {
         it('does not alter the id', function () {
-          return expect((new Subscription({ id: 'foo', url: 'foo' })).save())
+          var s = new Subscription({ id: 'foo', url: '/groups/2' });
+
+          return expect(s.save())
             .to.eventually.be.fulfilled
             .and.have.property('id', 'foo');
         });

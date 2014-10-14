@@ -294,13 +294,15 @@ describe('Subscription', function () {
   });
 
   describe('persistence', function () {
-    var t;
+    var t, exists;
 
     function chainspy() {
       return sinon.spy(function () { return this; });
     }
 
     beforeEach(function () {
+      exists = false;
+
       t = {
         zadd: chainspy(),
         hmset: chainspy(),
@@ -314,7 +316,7 @@ describe('Subscription', function () {
       });
 
       sinon.stub(Subscription, 'exists', function () {
-        return B.fulfilled(false);
+        return B.fulfilled(exists);
       });
     });
 
@@ -385,6 +387,8 @@ describe('Subscription', function () {
       });
 
       describe('for existing subscriptions', function () {
+        beforeEach(function () { exists = true; });
+
         it('does not alter the id', function () {
           var s = new Subscription({ id: 'foo', url: '/groups/2' });
 
@@ -427,11 +431,9 @@ describe('Subscription', function () {
       });
     });
 
-    it('does not change anything if subscription already has id', function () {
+    it('fails if subscription already has id', function () {
       var s = new Subscription({ id: 'foo' });
-
-      return expect(s.identify()).eventually.to.equal(s)
-        .and.to.have.property('id', 'foo');
+      return expect(s.identify()).to.eventually.be.rejected;
     });
   });
 

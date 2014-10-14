@@ -61,28 +61,24 @@ describe('API', function () {
   });
 
   describe('HEAD /api/subscription', function () {
-    it('returns the number of subscriptions in the header', function (done) {
-      chai.request(api)
+    it('returns the number of subscriptions in the header', function () {
+      return chai.request(api)
         .head('/api/subscription')
 
-        .end(function (err, res) {
-          expect(err).to.be.null;
-
+        .then(function (res) {
           expect(res)
             .to.have.status(200)
-            .and.not.to.have.header('content-type');
-
-          done();
+            .and.to.not.have.header('content-type');
         });
     });
   });
 
   describe('GET /api/subscription', function () {
-    it('loads the first page of subscriptions', function (done) {
-      chai.request(api)
+    it('loads the first page of subscriptions', function () {
+      return chai.request(api)
         .get('/api/subscription')
 
-        .end(function (err, res) {
+        .then(function (res) {
           expect(res)
             .to.have.status(200)
             .and.to.be.json;
@@ -94,15 +90,13 @@ describe('API', function () {
 
           expect(res.body).to.have.length(ids.length);
           expect(res.body[0]).to.have.keys(['id', 'url', 'version']);
-
-          done();
         });
     });
 
-    it('sets the total header and next/prev links', function (done) {
-      chai.request(api)
+    it('sets the total header and next/prev links', function () {
+      return chai.request(api)
         .get('/api/subscription?limit=2')
-        .end(function (err, res) {
+        .then(function (res) {
           expect(res)
             .to.have.status(200)
             .and.to.have.header('total-results', '3')
@@ -111,50 +105,44 @@ describe('API', function () {
           expect(res.headers.link)
             .to.match(/\/api\/subscription\?start=2&limit=2>; rel="next"/)
             .and.match(/\/api\/subscription\?start=1&limit=2>; rel="last"/);
-
-          done();
         });
     });
 
-    it('utilizes range params', function (done) {
-      chai.request(api)
+    it('utilizes range params', function () {
+      return chai.request(api)
         .get('/api/subscription?start=1&limit=5')
-        .end(function (err, res) {
+        .then(function (res) {
           expect(res)
             .to.have.status(200)
             .and.to.be.json;
 
           expect(Subscription.ids)
             .to.have.been.calledWith({ start: '1', limit: '5' });
-
-          done();
         });
     });
 
-    it('returns 400 for bad ranges', function (done) {
-      chai.request(api)
+    it('returns 400 for bad ranges', function () {
+      return chai.request(api)
         .get('/api/subscription?limit=-5')
-        .end(function (err, res) {
+        .then(function (res) {
           expect(res)
             .to.have.status(400)
             .and.to.be.json
             .and.to.have.deep.property('body.error');
-
-          done();
         });
     });
   });
 
   describe('POST /api/subscription', function () {
-    it('creates a new subscription from the request body', function (done) {
-      chai.request(api)
+    it('creates a new subscription from the request body', function () {
+      return chai.request(api)
         .post('/api/subscription')
 
         .send({
           url: '/users/7/items', key: 'foo'
         })
 
-        .end(function (err, res) {
+        .then(function (res) {
           expect(res)
             .to.have.status(201)
             .and.to.be.json
@@ -162,18 +150,16 @@ describe('API', function () {
 
           expect(res.body).to.have.property('url', '/users/7/items');
           expect(res.body).to.have.property('key', 'foo');
-
-          done();
         });
     });
 
-    it('creates a new subscription from url params', function (done) {
-      chai.request(api)
+    it('creates a new subscription from url params', function () {
+      return chai.request(api)
         .post('/api/subscription?url=/users/8/items&key=bar')
 
         .send({ key: 'foo' })
 
-        .end(function (err, res) {
+        .then(function (res) {
           expect(res)
             .to.have.status(201)
             .and.to.be.json
@@ -181,57 +167,49 @@ describe('API', function () {
 
           expect(res.body).to.have.property('url', '/users/8/items');
           expect(res.body).to.have.property('key', 'foo');
-
-          done();
         });
     });
 
-    it('fails if there is insufficient input', function (done) {
-      chai.request(api)
+    it('fails if there is insufficient input', function () {
+      return chai.request(api)
         .post('/api/subscription?key=bar')
 
-        .end(function (err, res) {
+        .then(function (res) {
           expect(res)
             .to.have.status(400)
             .and.to.be.json;
-
-          done();
         });
     });
   });
 
   describe('GET /api/subscription/:id', function () {
     describe('when the id exists', function () {
-      it('returns the subscrption', function (done) {
-        chai.request(api)
+      it('returns the subscrption', function () {
+        return chai.request(api)
           .get('/api/subscription/foo')
 
-          .end(function (err, res) {
+          .then(function (res) {
             expect(res)
               .to.have.status(200)
               .and.to.be.json;
 
             expect(res.body).to.have.property('id', 'foo');
             expect(res.body).to.have.keys(['id', 'url', 'version']);
-
-            done();
           });
       });
     });
 
     describe('when the id does not exists', function () {
-      it('returns a 404', function (done) {
-        chai.request(api)
+      it('returns a 404', function () {
+        return chai.request(api)
           .get('/api/subscription/needle')
-          .end(function (err, res) {
+          .then(function (res) {
 
             expect(res)
               .to.have.status(404)
               .and.to.be.json;
 
             expect(res.body).to.have.property('error');
-
-            done();
           });
       });
     });

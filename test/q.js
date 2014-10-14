@@ -8,7 +8,8 @@ chai.use(require('sinon-chai'));
 //var B = require('bluebird');
 var kue = require('kue');
 
-var q = require('../lib/q');
+var MessageQueue = require('../lib/q');
+var q = MessageQueue.singleton;
 
 describe('Q', function () {
   beforeEach(function () {
@@ -23,8 +24,8 @@ describe('Q', function () {
     kue.createQueue.restore();
   });
 
-  it('is an object', function () {
-    expect(q).to.be.an('object');
+  it('is a MessageQueue', function () {
+    expect(q).to.be.instanceof(MessageQueue);
   });
 
   describe('.jobs', function () {

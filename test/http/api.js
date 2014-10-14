@@ -68,7 +68,24 @@ describe('API', function () {
         .then(function (res) {
           expect(res)
             .to.have.status(200)
-            .and.to.not.have.header('content-type');
+            .and.to.have.header('total-results', '3')
+            .and.to.have.header('link')
+            .and.not.to.have.header('content-type');
+        });
+    });
+
+    it('sets next/prev links', function () {
+      return chai.request(api)
+        .head('/api/subscription?limit=2')
+        .then(function (res) {
+          expect(res)
+            .to.have.status(200)
+            .and.to.have.header('total-results', '3')
+            .and.to.have.header('link');
+
+          expect(res.headers.link)
+            .to.match(/\/api\/subscription\?start=2&limit=2>; rel="next"/)
+            .and.match(/\/api\/subscription\?start=1&limit=2>; rel="last"/);
         });
     });
   });

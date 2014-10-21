@@ -22,6 +22,7 @@ var capitalize = common.capitalize;
 program
   .version(arkivo.version)
 
+  .option('-v, --verbose', 'increase verbosity', verbosity, 0)
   .option('-k, --keys', 'show Zotero API keys in output')
   .option('-r, --redis <host:port>', 'configure the Redis connection', redis);
 
@@ -184,7 +185,8 @@ function num(action) {
 function backtrace(message) {
   return function (e) {
     console.error([message, e.message].join(': '));
-    console.error(e.stack);
+
+    if (program.verbose) console.error(e.stack);
 
     process.exit(1);
   };
@@ -222,4 +224,8 @@ function redis(input) {
   if (cfg[1]) arkivo.config.redis.port = cfg[1];
 
   return cfg;
+}
+
+function verbosity(v, total) {
+  return total + 1;
 }

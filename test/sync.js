@@ -328,7 +328,7 @@ describe('Session', function () {
       beforeEach(function () {
         sinon.stub(session, 'get', function () {
           var m = new FakeMessage();
-          m.modified = false;
+          m.unmodified = true;
 
           return delayed().then(function () { return m; });
         });
@@ -587,7 +587,7 @@ describe('Session', function () {
     this.interrupt = interrupt;
 
     this.multi    = true;
-    this.modified = true;
+    this.unmodified = false;
     this.type = 'json';
 
     this.data = {};

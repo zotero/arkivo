@@ -57,19 +57,33 @@ program
   .command('sync [subscriptions]')
   .description('synchronize the given (or all) subscription(s).')
 
-  .option('-s, --skip', 'skip download and plugin dispatch')
+  .option('-s, --skip', 'skip item download and plugin execution')
+  .option('-d, --dispatch', 'dispatch sync request')
 
   .action(function sync(id, options) {
+    var action;
+    var params = { id: id, all: !id, skip: options.skip };
 
-    arkivo
-      .controller.synchronize({
-        id: id, all: !id, skip: options.skip
-      })
+    if (options.dispatch) {
+      params.title = 'CLI-issued Synchronization Request';
 
-      .tap(function (s) {
-        console.log('%d subscription(s) synchronized', s.length);
-      })
+      action = arkivo.controller
+        .notify('sync', params)
 
+        .tap(function (job) {
+          console.log('Synchronization request #%d dispatched', job.id);
+        });
+
+    } else {
+      action = arkivo.controller
+        .synchronize(params)
+
+        .tap(function (s) {
+          console.log('%d subscription(s) synchronized', s.length);
+        });
+    }
+
+    action
       .then(shutdown)
 
       .catch(function (e) {
@@ -78,6 +92,7 @@ program
 
         process.exit(1);
       });
+
   });
 
 program

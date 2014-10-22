@@ -15,9 +15,10 @@
     "workers": 1
   },
 
-  "ui": {
+  "http": {
     "title": "Arkivo",
-    "port": 8888
+    "port": 8888,
+    "api": "/api"
   },
 
   "redis": {

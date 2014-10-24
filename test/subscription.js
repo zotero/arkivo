@@ -357,7 +357,7 @@ describe('Subscription', function () {
             key: 'zotero-api-key'
           }))
 
-          .destroy({ invalidate: true })
+          .destroy({ 'invalidate-key': true })
 
           .then(function () {
             expect(zotero.delete).to.have.been.called;

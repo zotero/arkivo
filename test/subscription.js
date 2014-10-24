@@ -8,7 +8,9 @@ chai.use(require('sinon-chai'));
 var B = require('bluebird');
 
 var Subscription = require('../lib/subscription');
-var defaults = require('../lib/defaults');
+var defaults     = require('../lib/defaults');
+var zotero       = require('../lib/zotero');
+
 var db = require('../lib/db')(defaults.subscription.prefix);
 
 function delayed() { return B.delay(0); }
@@ -326,9 +328,43 @@ describe('Subscription', function () {
     });
 
     describe('#destroy', function () {
+      beforeEach(function () {
+        sinon.stub(zotero, 'delete', function () {
+          return B.fulfilled();
+        });
+      });
+
+      afterEach(function () {
+        zotero.delete.restore();
+      });
+
       it('returns the destroyed instance', function () {
         var s = new Subscription();
         return expect(s.destroy()).to.eventually.equal(s);
+      });
+
+      it('does not invalidate keys by default', function () {
+        return (new Subscription({ key: 'zotero-api-key' }))
+          .destroy()
+          .then(function () {
+            expect(zotero.delete).to.not.have.been.called;
+          });
+      });
+
+      it('invalidates keys when passed invalidate option', function () {
+        return (new Subscription({
+            url: '/users/23/collections/XY/items',
+            key: 'zotero-api-key'
+          }))
+
+          .destroy({ invalidate: true })
+
+          .then(function () {
+            expect(zotero.delete).to.have.been.called;
+
+            expect(zotero.delete.args[0][0])
+              .to.eql('/users/23/keys/zotero-api-key');
+          });
       });
 
       it('removes id and contents', function () {

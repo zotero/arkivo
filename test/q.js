@@ -15,7 +15,8 @@ describe('Q', function () {
   beforeEach(function () {
     sinon.stub(kue, 'createQueue', function () {
       return {
-        shutdown: sinon.stub().yields()
+        shutdown: sinon.stub().yields(),
+        on: sinon.stub()
       };
     });
   });

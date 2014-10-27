@@ -12,7 +12,8 @@
   },
 
   "controller": {
-    "workers": 1
+    "workers": 1,
+    "timeout": 1000
   },
 
   "http": {

@@ -7,11 +7,8 @@
     "prefix": "s"
   },
 
-  "sync": {
-    "workers": 8
-  },
-
   "controller": {
+    "autoclean": false,
     "workers": 1,
     "timeout": 1000
   },

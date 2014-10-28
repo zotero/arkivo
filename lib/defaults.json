@@ -19,7 +19,8 @@
   "http": {
     "title": "Arkivo",
     "port": 8888,
-    "api": "/api"
+    "api": "/api",
+    "timeout": 1000
   },
 
   "redis": {

@@ -11,6 +11,7 @@ var server = require('../../lib/http').instance;
 
 //var Range        = require('../../lib/range');
 var Subscription = require('../../lib/subscription');
+var controller   = require('../../lib/controller').instance;
 
 var defaults = require('../../lib/defaults');
 var db = require('../../lib/db')(defaults.subscription.prefix);
@@ -229,6 +230,69 @@ describe('API', function () {
             expect(res.body).to.have.property('error');
           });
       });
+    });
+  });
+
+  describe('POST /api/sync', function () {
+
+    beforeEach(function () {
+      sinon.stub(controller, 'notify', function (type, data) {
+        return B.fulfilled({
+          id: '42', type: type, data: data
+        });
+      });
+    });
+
+    afterEach(function () {
+      controller.notify.restore();
+    });
+
+    it('creates a new sync job for the given id', function () {
+      return chai.request(api)
+        .post('/api/sync')
+
+        .send({
+          id: 23, skip: true
+        })
+
+        .then(function (res) {
+          expect(res)
+            .to.have.status(201)
+            .and.to.be.json
+            .and.to.have.header('location', '/api/job/42');
+
+          expect(res.body).to.have.deep.property('data.skip', true);
+          expect(res.body).to.have.deep.property('data.id', 23);
+        });
+    });
+
+    it('syncs all subscription if no id given', function () {
+      return chai.request(api)
+        .post('/api/sync')
+
+        .then(function (res) {
+          expect(res)
+            .to.have.status(201)
+            .and.to.be.json
+            .and.to.have.header('location', '/api/job/42');
+
+          expect(res.body).to.not.have.deep.property('data.skip');
+          expect(res.body).to.have.deep.property('data.all', true);
+        });
+    });
+
+    it('filters the POST params', function () {
+      return chai.request(api)
+        .post('/api/sync')
+
+        .send({
+          id: 23, foo: 'bar'
+        })
+
+        .then(function (res) {
+          expect(res.body).to.not.have.deep.property('data.foo');
+          expect(res.body).to.have.deep.property('data.id', 23);
+        });
     });
   });
 

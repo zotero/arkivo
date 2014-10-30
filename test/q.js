@@ -9,7 +9,7 @@ chai.use(require('sinon-chai'));
 var kue = require('kue');
 
 var MessageQueue = require('../lib/q');
-var q = MessageQueue.singleton;
+var q = MessageQueue.instance;
 
 describe('Q', function () {
   beforeEach(function () {

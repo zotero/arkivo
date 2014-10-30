@@ -8,7 +8,7 @@ chai.use(require('sinon-chai'));
 var B = require('bluebird');
 
 var Controller = require('../lib/controller');
-var controller = Controller.singleton;
+var controller = Controller.instance;
 
 var Subscription = require('../lib/subscription');
 

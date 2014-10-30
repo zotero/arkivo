@@ -7,7 +7,7 @@ chai.use(require('sinon-chai'));
 
 var B = require('bluebird');
 
-var server = require('../../lib/http').singleton;
+var server = require('../../lib/http').instance;
 
 //var Range        = require('../../lib/range');
 var Subscription = require('../../lib/subscription');

@@ -15,7 +15,7 @@ var Synchronizer = require('../lib/sync');
 
 var Session          = Synchronizer.Session;
 var InterruptedError = Synchronizer.InterruptedError;
-var sync             = Synchronizer.singleton;
+var sync             = Synchronizer.instance;
 
 function delayed() { return B.delay(0); }
 

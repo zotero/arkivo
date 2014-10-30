@@ -127,8 +127,8 @@ if (!program.args.length) program.help();
 // --- Helpers ---
 
 function shutdown() {
-  arkivo.db.reset();
   process.stdin.destroy();
+  return arkivo.controller.stop();
 }
 
 function quit() { process.exit(0); }

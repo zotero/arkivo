@@ -210,7 +210,22 @@ describe('Synchronizer', function () {
             .then(function () {
               expect(three).to.have.been.called;
             });
+        });
+
+        describe('if a plugin fails', function () {
+          var four;
+
+          beforeEach(function () {
+            four = sinon.stub().returns(B.rejected());
+
+            plugins.add({ name: 'four',  process: four });
+            data.subscription.plugins.push({ name: 'four' });
           });
+
+          it('fails', function () {
+            return expect(sync.dispatch(data)).to.eventually.be.rejected;
+          });
+        });
       });
     });
   });

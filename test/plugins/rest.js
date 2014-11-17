@@ -38,8 +38,7 @@ describe('Plugin "rest"', function () {
 
   describe('#process', function () {
     var HOST = 'http://example.com';
-    var sync;
-    var plugin;
+    var sync, plugin;
 
     beforeEach(function () {
       sync = new Session(new Subscription({

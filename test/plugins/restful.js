@@ -44,7 +44,7 @@ describe('Plugin "restful"', function () {
       }));
     });
 
-    afterEach(function () { console.log.restore(); });
+    afterEach(function () {});
 
   });
 });

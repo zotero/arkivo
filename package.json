@@ -47,6 +47,7 @@
     "istanbul-harmony": "^0.2.9",
     "jshint": "^2.5.2",
     "mocha": "~1.20.1",
+    "nock": "^0.50.0",
     "sinon": "^1.10.3",
     "sinon-chai": "^2.5.0"
   },

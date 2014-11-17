@@ -54,7 +54,7 @@ describe('Plugin "logger"', function () {
 
         expect(sync.modified).to.be.false;
 
-        plugins.use('logger').process(sync, function () {
+        plugins.use('logger', {}).process(sync, function () {
           expect(console.log).to.have.been.called;
           done();
         });
@@ -69,7 +69,7 @@ describe('Plugin "logger"', function () {
 
       expect(sync.modified).to.be.true;
 
-      plugins.use('logger').process(sync, function () {
+      plugins.use('logger', {}).process(sync, function () {
         expect(console.log).to.have.been.called;
         done();
       });

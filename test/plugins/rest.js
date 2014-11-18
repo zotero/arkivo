@@ -36,6 +36,22 @@ describe('Plugin "rest"', function () {
     expect(plugins.use('rest')).to.have.property('summary');
   });
 
+  it('must be configured with URLs', function () {
+    var config = {};
+
+    expect(plugins.use.bind(plugins, 'rest', config)).to.throw(Error);
+
+    config.create = 'http://example.com/create';
+    config.update = 'http://example.com/update';
+    config.delete = 'foo';
+
+    expect(plugins.use.bind(plugins, 'rest', config)).to.throw(Error);
+
+    config.delete = 'http://example.com/delete';
+
+    expect(plugins.use.bind(plugins, 'rest', config)).to.not.throw(Error);
+  });
+
   describe('#process', function () {
     var HOST = 'http://example.com';
     var sync, plugin;

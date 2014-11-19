@@ -31,6 +31,7 @@
     "commander": "^2.3.0",
     "debug": "~1.0.3",
     "express": "^4.9.0",
+    "fs-extra": "^0.12.0",
     "gnode": "^0.1.0",
     "http-close": "0.0.2",
     "kue": "~0.8.5",

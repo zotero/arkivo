@@ -453,12 +453,16 @@ describe('Session', function () {
       session.updated = ['foo', 'baz'];
 
       sinon.stub(session, 'get', function (_, options) {
+        options = options || {};
+
         var m = new FakeMessage(1);
 
         if (options.itemKey) {
           m.data = options.itemKey.split(',').map(function (key) {
             return { key: key, version: 1 };
           });
+        } else {
+          m.data = [];
         }
 
         return delayed().then(function () { return m; });

@@ -67,7 +67,6 @@ program
       console.log('%s: %s', pad(name, ' ', 18), value);
     }
 
-    function to_name(o) { return o.name; }
     function separate() { console.log(''); }
 
     Subscription
@@ -83,7 +82,7 @@ program
         if (program.keys)
           print('API key', s.key);
 
-        print('Plugins', s.plugins.map(to_name).join(', '));
+        print('Plugins', JSON.stringify(s.plugins));
 
         print('Current version', s.version);
         print('Last updated at', s.timestamp);

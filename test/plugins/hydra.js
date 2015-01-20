@@ -11,9 +11,6 @@ chai.use(require('chai-as-promised'));
 var plugins      = require('../../lib/plugins');
 var hydra        = require('../../lib/plugins/hydra');
 
-var Session      = require('../../lib/sync').Session;
-var Subscription = require('../../lib/subscription');
-
 
 describe('Plugin "hydra"', function () {
 
@@ -43,30 +40,10 @@ describe('Plugin "hydra"', function () {
 
     config.host = 'http://example.com:8181';
 
-    var plugin = plugins.use('hydra', config);
-
-    expect(plugin.options).to.have.property('host', config.host);
+    expect(plugins.use.bind(plugins, 'hydra', config)).to.not.throw(Error);
   });
 
   describe('#process', function () {
-    var HOST = 'http://example.com';
-    var sync, plugin;
-
-    beforeEach(function () {
-      sync = new Session(new Subscription({
-        url: '/users/42/items'
-      }));
-
-      sync.version = 11;
-      sync.items.foo = {
-        key: 'foo',
-        data: {}
-      };
-
-      plugin = plugins.use('hydra', {
-        host: HOST
-      });
-    });
 
     it('calls create path for all created items', function () {
     });
@@ -78,4 +55,3 @@ describe('Plugin "hydra"', function () {
     });
   });
 });
-

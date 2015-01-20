@@ -76,4 +76,3 @@ describe('Plugin "logger"', function () {
     });
   });
 });
-

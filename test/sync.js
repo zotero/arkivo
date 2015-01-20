@@ -75,7 +75,7 @@ describe('Synchronizer', function () {
 
       return B.all([
           sync.synchronize(sub),
-          sync.synchronize(sub, true),
+          sync.synchronize(sub, true)
         ])
         .then(function () {
           var execute = Session.prototype.execute;

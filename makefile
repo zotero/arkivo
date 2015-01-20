@@ -7,7 +7,7 @@ doc:
 	${BIN}/yuidoc .
 
 lint:
-	@${BIN}/jshint --verbose ${SRC} ${TEST} ./bin/*.js
+	@${BIN}/eslint ${SRC} ${TEST} ./bin/*.js
 
 test: lint
 	@${BIN}/mocha --harmony-generators ${TEST}

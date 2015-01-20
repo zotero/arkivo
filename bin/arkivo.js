@@ -103,7 +103,7 @@ program
 // --- Tab-Completion ---
 
 if (process.argv[2] === 'completion') {
-  return tabtab.complete('arkivo', function (error, data) {
+  tabtab.complete('arkivo', function (error, data) {
     if (error || !data) return undefined;
 
     function to_long(o)  { return o.long;  }
@@ -118,11 +118,13 @@ if (process.argv[2] === 'completion') {
 
     tabtab.log(program.commands.map(to_name), data);
   });
+
+} else {
+
+  program.parse(process.argv);
+
+  if (!program.args.length) program.help();
 }
-
-program.parse(process.argv);
-
-if (!program.args.length) program.help();
 
 // --- Helpers ---
 

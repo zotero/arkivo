@@ -36,7 +36,6 @@
     "http-close": "0.0.2",
     "kue": "~0.8.5",
     "redis": "~0.11.0",
-    "superagent": "^0.21.0",
     "tabtab": "0.0.2",
     "zotero": "inukshuk/zotero-node"
   },

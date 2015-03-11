@@ -5,6 +5,10 @@
 # Travis-CI configuration
 .travis.yml
 
+# Git
+.git
+.gitignore
+
 # Coverage directory used by tools like istanbul
 coverage
 
@@ -12,7 +16,7 @@ coverage
 doc
 docs
 
-# Locale dependencies
+# Local dependencies
 node_modules
 
 # Vagrant configuration and Puppet modules
@@ -21,3 +25,10 @@ puppet
 
 # Vagrant cache
 .vagrant
+
+# Do not publish test and dev files
+test
+makefile
+yuidoc.json
+.eslintrc
+.jshintrc

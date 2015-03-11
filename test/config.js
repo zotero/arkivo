@@ -4,12 +4,10 @@ var expect = require('chai').expect;
 var config = require('../lib/config');
 
 describe('config', function () {
-  it('has options', function () {
-    expect(config).to.have.property('options');
-  });
 
-  it('has aliases for each module section', function () {
-    expect(config.q).to.equal(config.options.q);
+  it('has readers for each module section', function () {
+    expect(config.proxy).to.have.property('q').and.have.property('prefix', 'q');
+
     expect(config.subscription).to.equal(config.options.subscription);
     expect(config.sync).to.equal(config.options.sync);
     expect(config.redis).to.equal(config.options.redis);

@@ -1,0 +1,30 @@
+{
+  "q": {
+    "prefix": "q"
+  },
+
+  "subscription": {
+    "prefix": "s"
+  },
+
+  "controller": {
+    "autoclean": false,
+    "workers": 1,
+    "timeout": 1000
+  },
+
+  "http": {
+    "title": "Arkivo",
+    "port": 8888,
+    "api": "/api",
+    "timeout": 1000
+  },
+
+  "redis": {
+    "port": 6379,
+    "host": "127.0.0.1",
+    "options": {
+      "parser": "hiredis"
+    }
+  }
+}

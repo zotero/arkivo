@@ -15,8 +15,8 @@ var server = require('../../lib/http').instance;
 var Subscription = require('../../lib/subscription');
 var controller   = require('../../lib/controller').instance;
 
-var defaults = require('../../lib/defaults');
-var db = require('../../lib/db')(defaults.subscription.prefix);
+var defaults = require('../../lib/config').subscription;
+var db = require('../../lib/db')(defaults.prefix);
 
 describe('API', function () {
   var api, ids;

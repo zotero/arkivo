@@ -10,10 +10,10 @@ chai.use(require('sinon-chai'));
 var B = require('bluebird');
 
 var Subscription = require('../lib/subscription');
-var defaults     = require('../lib/defaults');
+var defaults     = require('../lib/config').subscription;
 var zotero       = require('../lib/zotero');
 
-var db = require('../lib/db')(defaults.subscription.prefix);
+var db = require('../lib/db')(defaults.prefix);
 
 function delayed() { return B.delay(0); }
 

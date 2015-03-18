@@ -1,4 +1,4 @@
-// vi: set ft=javascript :
+// vi: set ft=json :
 {
   "ecmaFeatures": {
     "blockBindings": true,

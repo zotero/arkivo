@@ -17,6 +17,9 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 
+# Generated API Documentation
+doc
+
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 

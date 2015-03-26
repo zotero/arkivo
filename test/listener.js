@@ -25,7 +25,7 @@ describe('Listener', function () {
       return stream;
     });
 
-    listener = new Listener();
+    listener = new Listener().start();
 
     uncaught = sinon.spy();
     listener.on('error', uncaught);

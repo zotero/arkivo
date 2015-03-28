@@ -49,7 +49,7 @@ describe('Listener', function () {
     describe('when given a single subscription', function () {
       beforeEach(function () {
         subscriptions = [
-          new Subscription({ key: 'foo', url: '/bar/baz' })
+          new Subscription({ key: 'foo', url: '/users/42/baz' })
         ];
 
         expect(listener.stream.subscribe).not.to.have.been.called;
@@ -70,7 +70,7 @@ describe('Listener', function () {
 
         expect(data[0])
           .to.have.property('topics')
-          .and.to.contain(subscriptions[0].url);
+          .and.to.contain(subscriptions[0].topic);
       });
 
       it('adds the subscription to pending', function () {
@@ -81,7 +81,7 @@ describe('Listener', function () {
 
       it('resolves the promise on resolve key/topic', function () {
         process.nextTick(function () {
-          listener.resolve(subscriptions[0].key, subscriptions[0].path);
+          listener.resolve(subscriptions[0].key, subscriptions[0].topic);
           expect(listener.pending).to.be.empty;
         });
 
@@ -93,7 +93,7 @@ describe('Listener', function () {
 
       it('rejects the promise on reject key/topic', function () {
         process.nextTick(function () {
-          listener.reject(subscriptions[0].key, subscriptions[0].path);
+          listener.reject(subscriptions[0].key, subscriptions[0].topic);
           expect(listener.pending).to.be.empty;
         });
 

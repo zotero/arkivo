@@ -92,6 +92,24 @@ describe('Subscription', function () {
     });
   });
 
+  describe('#topic', function () {
+    it('returns the URLs topic part', function () {
+      var s = new Subscription();
+
+      s.url = '/users/123/items/publications';
+      expect(s.topic).to.eql('/users/123');
+
+      s.url = '/users/123/items';
+      expect(s.topic).to.eql('/users/123');
+
+      s.url = '/groups/123/foo';
+      expect(s.topic).to.eql('/groups/123');
+
+      s.url = '/groups/123/publications/foo';
+      expect(s.topic).to.eql('/groups/123/publications');
+    });
+  });
+
   describe('#version', function () {
     it('is zero by default', function () {
       expect((new Subscription()).version).to.equal(0);

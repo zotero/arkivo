@@ -43,6 +43,8 @@ describe('Controller', function () {
       Subscription.prototype.save.restore();
       Subscription.prototype.destroy.restore();
       Subscription.load.restore();
+
+      controller.options.listen = true;
     });
 
     describe('#subscribe', function () {

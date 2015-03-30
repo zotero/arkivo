@@ -21,7 +21,10 @@ var db = require('../../lib/db')(defaults.prefix);
 describe('API', function () {
   var api, ids;
 
-  before(function () { api = server.initialize().app; });
+  before(function () {
+    controller.options.listen = false;
+    api = server.initialize().app;
+  });
 
   beforeEach(function () {
     ids = ['foo', 'bar', 'baz'];
@@ -61,6 +64,10 @@ describe('API', function () {
     Subscription.ids.restore();
     Subscription.load.restore();
     Subscription.prototype.save.restore();
+  });
+
+  after(function () {
+    controller.options.listen = true;
   });
 
   describe('HEAD /api/subscription', function () {
@@ -154,6 +161,14 @@ describe('API', function () {
   });
 
   describe('POST /api/subscription', function () {
+    beforeEach(function () {
+      sinon.stub(controller, 'notify');
+    });
+
+    afterEach(function () {
+      controller.notify.restore();
+    });
+
     it('creates a new subscription from the request body', function () {
       return chai.request(api)
         .post('/api/subscription')

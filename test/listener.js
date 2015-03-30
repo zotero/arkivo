@@ -21,6 +21,7 @@ describe('Listener', function () {
       var stream = new EventEmitter();
 
       stream.subscribe = sinon.stub().yields();
+      stream.unsubscribe = sinon.stub().yields();
 
       return stream;
     });
@@ -41,6 +42,33 @@ describe('Listener', function () {
 
   it('opens a zotero stream', function () {
     expect(listener).to.have.property('stream');
+  });
+
+  describe('.remove', function () {
+    beforeEach(function () {
+      listener.current.push({
+        id: 'foo', key: 'bar', topic: '/users/42/items'
+      });
+
+      listener.current.push({
+        id: 'baz', topic: '/users/42/items'
+      });
+    });
+
+    it('removes the subscription by id', function () {
+      expect(listener.current).to.have.length(2);
+
+      return listener
+        .remove({ id: 'foo' })
+        .then(function () {
+          expect(listener.current).to.have.length(1);
+
+          expect(listener.stream.unsubscribe).to.have.been.called;
+          expect(listener.stream.unsubscribe.args[0][0])
+            .to.have.property('apiKey', 'bar');
+        });
+    });
+
   });
 
   describe('.add', function () {
@@ -77,12 +105,14 @@ describe('Listener', function () {
         expect(listener.pending).to.be.empty;
         listener.add(subscriptions);
         expect(listener.pending).to.have.length(1);
+        expect(listener.current).to.be.empty;
       });
 
       it('resolves the promise on resolve key/topic', function () {
         process.nextTick(function () {
           listener.resolve(subscriptions[0].key, subscriptions[0].topic);
           expect(listener.pending).to.be.empty;
+          expect(listener.current).to.have.length(1);
         });
 
         return expect(listener.add(subscriptions))

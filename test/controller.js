@@ -34,6 +34,8 @@ describe('Controller', function () {
       });
 
       sinon.stub(controller, 'notify');
+
+      controller.options.listen = false;
     });
 
     afterEach(function () {

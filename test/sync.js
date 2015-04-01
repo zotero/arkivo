@@ -59,7 +59,7 @@ describe('Synchronizer', function () {
         .to.eventually.be.instanceof(Session);
     });
 
-    it('touches and saves the subscription', function () {
+    it('touches but does not save the subscription', function () {
       expect(sub.touch).to.not.have.been.called;
       expect(sub.save).to.not.have.been.called;
       expect(sub.update).to.not.have.been.called;
@@ -67,7 +67,7 @@ describe('Synchronizer', function () {
       return sync.synchronize(sub)
         .then(function () {
           expect(sub.touch).to.have.been.called;
-          expect(sub.save).to.have.been.called;
+          expect(sub.save).to.not.have.been.called;
           expect(sub.update).to.not.have.been.called;
         });
     });

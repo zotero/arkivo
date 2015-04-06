@@ -6,7 +6,8 @@
       "workers": 1,       // The number of workers per queue
       "listen": true,     // Connect to the Zotero Stream API
       "timeout": 1000,    // Shutdown grace period
-      "delay": 3000       // Delay before sync on Stream API update
+      "delay": 3000,      // Delay before sync on Stream API update
+      "promote": 5000
     },
 
     "http": {

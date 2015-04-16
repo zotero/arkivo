@@ -137,7 +137,8 @@ program
   .description('Subscribe to the given Zotero URL')
 
   .option('-K, --key <key>', 'set Zotero API key')
-  .option('-P, --plugins <plugin>', 'add plugin by name', plugin, [])
+  .option('-P, --plugin <plugin>[:<options>]',
+    'add plugin by name', plugins, [])
 
   .action(function add(url, options) {
     var s = new Subscription({ url: url });
@@ -145,12 +146,12 @@ program
     if (options.key) s.key = options.key;
 
     if (options.plugins.length) {
-      options.plugins.forEach(function (name) {
+      options.plugins.forEach(function (plugin) {
 
-        if (!arkivo.plugins.available[name])
-          console.log('Warning: plugin %s not found', name);
+        if (!arkivo.plugins.available[plugin.name])
+          console.log('Warning: plugin %s not found', plugin.name);
 
-        s.plugins.push({ name: name });
+        s.plugins.push(plugin);
       });
     }
 
@@ -191,8 +192,18 @@ function backtrace(message) {
   };
 }
 
-function plugin(string, list) {
-  return list.concat(string.split(','));
+function plugins(string, list) {
+  var p = {};
+
+  var m = (/^(\w+)(:(.)+)?/).exec(string);
+  if (!m) throw new Error('invalid plugin: ' + string);
+
+  p.name = m[1];
+  if (m[3]) p.options = JSON.parse(m[3]);
+
+  list.push(p);
+
+  return list;
 }
 
 function confirm(question) {

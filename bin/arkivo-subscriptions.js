@@ -195,7 +195,7 @@ function backtrace(message) {
 function plugins(string, list) {
   var p = {};
 
-  var m = (/^(\w+)(:(.)+)?/).exec(string);
+  var m = (/^(\w+)(:(.+))?/).exec(string);
   if (!m) throw new Error('invalid plugin: ' + string);
 
   p.name = m[1];

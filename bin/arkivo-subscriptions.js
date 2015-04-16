@@ -137,7 +137,7 @@ program
   .description('Subscribe to the given Zotero URL')
 
   .option('-K, --key <key>', 'set Zotero API key')
-  .option('-P, --plugin <plugin>[:<options>]',
+  .option('-P, --plugins <plugin>[:<options>]',
     'add plugin by name', plugins, [])
 
   .action(function add(url, options) {

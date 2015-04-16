@@ -199,7 +199,9 @@ function plugins(string, list) {
   if (!m) throw new Error('invalid plugin: ' + string);
 
   p.name = m[1];
-  if (m[3]) p.options = JSON.parse(m[3]);
+
+  if (m[3])
+    p.options = JSON.parse('{' + m[3] + '}');
 
   list.push(p);
 

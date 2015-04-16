@@ -52,5 +52,24 @@ To enable debug output you can set a filter for each component in the
     $ DEBUG=arkivo:*,zotero:* arkivo up
     # Enables debug output of all arkivo and zotero components
 
-By running `akrkivo up` you start all arkivo services, including
+The available components for which debug output can be enabled individually
+include: `controller`, `db`, `http`, `listener`, `q` `subscription`, and
+`sync`.
+
+By running `arkivo up` you start all arkivo services, including
 the web monitor and API at http://localhost:8888/api.
+
+Configuration
+-------------
+Arkivo uses the Node module [config](https://github.com/lorenwest/node-config)
+to load configuration files. You can use the command line option
+`--NODE_CONFIG` or environment variable `NODE_CONFIG` to override the
+configuration, or use the environment variable `NODE_CONFIG_DIR` to specify
+from where Arkivo should load additional configuration files. By default
+Arkivo will look for a `config` folder in your current working directory,
+i.e., the directory where you started the Arkivo process; in your config
+folder you can place configuration files for different Node environments.
+
+To see which configuration options are available, consult the
+[default configuration](https://github.com/inukshuk/arkivo/blob/master/config/default.json).
+

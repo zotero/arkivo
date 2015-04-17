@@ -150,12 +150,10 @@ describe('API', function () {
 
     it('returns 400 for bad ranges', function () {
       return chai.request(api)
-        .get('/api/subscription?limit=-5')
-        .then(function (res) {
-          expect(res)
-            .to.have.status(400)
-            .and.to.be.json
-            .and.to.have.deep.property('body.error');
+        .get('/api/subscription')
+        .query({ limit: -5 })
+        .then(null, function (error) {
+          expect(error).to.have.property('message', 'Bad Request');
         });
     });
   });
@@ -209,10 +207,8 @@ describe('API', function () {
       return chai.request(api)
         .post('/api/subscription?key=bar')
 
-        .then(function (res) {
-          expect(res)
-            .to.have.status(400)
-            .and.to.be.json;
+        .then(null, function (error) {
+          expect(error).to.have.property('message', 'Bad Request');
         });
     });
   });
@@ -238,13 +234,8 @@ describe('API', function () {
       it('returns a 404', function () {
         return chai.request(api)
           .get('/api/subscription/needle')
-          .then(function (res) {
-
-            expect(res)
-              .to.have.status(404)
-              .and.to.be.json;
-
-            expect(res.body).to.have.property('error');
+          .then(null, function (error) {
+            expect(error).to.have.property('message', 'Not Found');
           });
       });
     });

@@ -9,7 +9,7 @@ them to any number of Arkivo plugins for further processing.
 
 Requirements
 ------------
-* Node.js (0.10+, ideally 0.12)
+* Node.js (>= 0.10, ideally 0.12), io.js (>= 1.7)
 * Redis
 
 Quickstart
@@ -90,7 +90,7 @@ the `arkivo-kindle` plugin (installed via NPM) and a local plugin:
 
     {
       "arkivo": {
-        "plugins": [ "arkivo-kindle", "/opt/arkivo/plugins/libnotify.js" ]
+        "plugins": ["arkivo-kindle", "/opt/arkivo/plugins/libnotify.js"]
       }
     }
 

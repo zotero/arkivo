@@ -18,6 +18,8 @@ var controller   = require('../../lib/controller').instance;
 var defaults = require('../../lib/config').subscription;
 var db = require('../../lib/db')(defaults.prefix);
 
+function nothing() { expect(true).to.be.false; }
+
 describe('API', function () {
   var api, ids;
 
@@ -152,7 +154,7 @@ describe('API', function () {
       return chai.request(api)
         .get('/api/subscription')
         .query({ limit: -5 })
-        .then(null, function (error) {
+        .then(nothing, function (error) {
           expect(error).to.have.property('message', 'Bad Request');
         });
     });
@@ -207,7 +209,7 @@ describe('API', function () {
       return chai.request(api)
         .post('/api/subscription?key=bar')
 
-        .then(null, function (error) {
+        .then(nothing, function (error) {
           expect(error).to.have.property('message', 'Bad Request');
         });
     });
@@ -234,7 +236,7 @@ describe('API', function () {
       it('returns a 404', function () {
         return chai.request(api)
           .get('/api/subscription/needle')
-          .then(null, function (error) {
+          .then(nothing, function (error) {
             expect(error).to.have.property('message', 'Not Found');
           });
       });

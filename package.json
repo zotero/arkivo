@@ -51,8 +51,5 @@
     "sinon": "~1.10.3",
     "sinon-chai": "~2.7.0",
     "yuidocjs": "^0.6.0"
-  },
-  "engines": {
-    "node": ">= 0.11.9"
   }
 }

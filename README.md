@@ -18,8 +18,10 @@ Install `arkivo` using NPM:
 
     $ npm install arkivo
 
-This will install the `arkivo` executable  locally (or globally if
-you use the `-g` switch).
+This will install the `arkivo` executable  locally or globally if
+you use the `-g` switch; when installed globally, you can leave out
+the `$(npm bin)` in the examples below, as the Arkivo executables
+should be in your global path already.
 
     $ $(npm bin)/arkivo -h
     # Prints out the list of command-line options
@@ -90,7 +92,7 @@ the `arkivo-kindle` plugin (installed via NPM) and a local plugin:
 
     {
       "arkivo": {
-        "plugins": ["arkivo-kindle", "/opt/arkivo/plugins/libnotify.js"]
+        "plugins": ["arkivo-kindle", "/opt/arkivo/plugins/libnotify"]
       }
     }
 

@@ -60,7 +60,7 @@ To enable debug output you can set a filter for each component in the
 
 The available components for which debug output can be enabled individually
 include: `controller`, `db`, `http`, `listener`, `q` `subscription`, and
-`sync`.
+`sync`. To see stack traces after errors, enable the `arkivo:trace` output.
 
 By running `arkivo up` you start all Arkivo services, including
 the web monitor and API at http://localhost:8888/api.

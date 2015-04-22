@@ -87,26 +87,14 @@ describe('Subscription', function () {
       s.url = '/users/123/foo';
       expect(s.library).to.eql('/users/123');
 
-      s.url = '/groups/123/foo';
-      expect(s.library).to.eql('/groups/123');
-    });
-  });
+      s.url = '/groups/1234/foo';
+      expect(s.library).to.eql('/groups/1234');
 
-  describe('#topic', function () {
-    it('returns the URLs topic part', function () {
-      var s = new Subscription();
+      s.url = '/users/12345/publications';
+      expect(s.library).to.eql('/users/12345/publications');
 
-      s.url = '/users/123/items/publications';
-      expect(s.topic).to.eql('/users/123');
-
-      s.url = '/users/123/items';
-      expect(s.topic).to.eql('/users/123');
-
-      s.url = '/groups/123/foo';
-      expect(s.topic).to.eql('/groups/123');
-
-      s.url = '/groups/123/publications/foo';
-      expect(s.topic).to.eql('/groups/123/publications');
+      s.url = '/users/123/publications/items';
+      expect(s.library).to.eql('/users/123/publications');
     });
   });
 

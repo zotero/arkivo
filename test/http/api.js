@@ -118,7 +118,7 @@ describe('API', function () {
           expect(Subscription.load).to.have.been.calledThrice;
 
           expect(res.body).to.have.length(ids.length);
-          expect(res.body[0]).to.have.keys(['id', 'url', 'version']);
+          expect(res.body[0]).to.have.keys(['id', 'url', 'key', 'version']);
         });
     });
 
@@ -227,7 +227,7 @@ describe('API', function () {
               .and.to.be.json;
 
             expect(res.body).to.have.property('id', 'foo');
-            expect(res.body).to.have.keys(['id', 'url', 'version']);
+            expect(res.body).to.have.keys(['id', 'url', 'key', 'version']);
           });
       });
     });

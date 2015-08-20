@@ -213,6 +213,23 @@ describe('API', function () {
           expect(error).to.have.property('message', 'Bad Request');
         });
     });
+
+    it('does not save undefined keys', function () {
+      return chai.request(api)
+        .post('/api/subscription')
+
+        .send({ url: '/users/7/items' })
+
+        .then(function (res) {
+          expect(res)
+            .to.have.status(201)
+            .and.to.be.json
+            .and.to.have.header('location', '/api/subscription/id');
+
+          expect(res.body).to.have.property('url', '/users/7/items');
+          expect(res.body).to.have.property('key', '');
+        });
+    });
   });
 
   describe('GET /api/subscription/:id', function () {

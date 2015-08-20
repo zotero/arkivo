@@ -45,7 +45,7 @@
     "chai-as-promised": "~4.3.0",
     "chai-http": "chaijs/chai-http",
     "eslint": "^1.2.0",
-    "istanbul-harmony": "^0.2.9",
+    "istanbul-harmony": "^0.3.16",
     "mocha": "~2.1.0",
     "nock": "~0.50.0",
     "sinon": "~1.10.3",

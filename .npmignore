@@ -28,6 +28,7 @@ puppet
 
 # Do not publish test and dev files
 test
+tmp
 makefile
 yuidoc.json
 .eslintrc

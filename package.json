@@ -39,7 +39,6 @@
     "http-close": "0.0.2",
     "kue": "~0",
     "redis": "^2.4.2",
-    "segfault-handler": "^0.2.4",
     "tabtab": "~0",
     "zotero": "~0"
   },

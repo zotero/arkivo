@@ -10,21 +10,19 @@ lint:
 	@${BIN}/eslint ${SRC} ${TEST} ./bin/*.js
 
 test: lint
-	@${BIN}/mocha --harmony-generators ${TEST}
+	@${BIN}/mocha ${TEST}
 
 debug:
-	@${BIN}/mocha --harmony-generators debug ${TEST}
+	@${BIN}/mocha debug ${TEST}
 
 test-travis:
-	@node --harmony-generators \
-		${BIN}/istanbul cover ${BIN}/_mocha --report-lcovonly -- ${TEST}
+	@node ${BIN}/istanbul cover ${BIN}/_mocha --report-lcovonly -- ${TEST}
 
 spec:
-	@${BIN}/mocha --harmony-generators --reporter spec ${TEST}
+	@${BIN}/mocha --reporter spec ${TEST}
 
 coverage: clean
-	@node --harmony-generators \
-		${BIN}/istanbul cover ${BIN}/_mocha -- ${TEST}
+	@node ${BIN}/istanbul cover ${BIN}/_mocha -- ${TEST}
 
 clean:
 	@rm -rf ./coverage

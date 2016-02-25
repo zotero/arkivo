@@ -3,8 +3,6 @@
 
 // --- Dependencies ---
 
-require('gnode');
-
 var debug   = require('debug')('arkivo');
 var B       = require('bluebird');
 var program = require('commander');

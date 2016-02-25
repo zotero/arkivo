@@ -76,9 +76,9 @@ describe('Synchronizer', function () {
       expect(Session.prototype.execute).to.not.have.been.called;
 
       return B.all([
-          sync.synchronize(sub),
-          sync.synchronize(sub, true)
-        ])
+        sync.synchronize(sub),
+        sync.synchronize(sub, true)
+      ])
         .then(function () {
           var execute = Session.prototype.execute;
 
@@ -100,7 +100,7 @@ describe('Synchronizer', function () {
 
       it('updates the subscription', function () {
         return sync.synchronize(sub)
-          .then(function (s) {
+          .then(function () {
             expect(sub.update).to.have.been.called;
             expect(sub.update.args[0][0]).to.have.property('version', 42);
           });
@@ -262,9 +262,9 @@ describe('Session', function () {
       expect(session.update).to.not.have.been.called;
 
       return B.all([
-          session.execute(),
-          session.execute(true)
-        ]).then(function () {
+        session.execute(),
+        session.execute(true)
+      ]).then(function () {
           expect(session.update).to.have.been.calledTwice;
         });
     });
@@ -273,9 +273,9 @@ describe('Session', function () {
       expect(session.download).to.not.have.been.called;
 
       return B.all([
-          session.execute(),
-          session.execute(true)
-        ]).then(function () {
+        session.execute(),
+        session.execute(true)
+      ]).then(function () {
           expect(session.download).to.have.been.calledOnce;
         });
     });

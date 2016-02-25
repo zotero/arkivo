@@ -361,9 +361,9 @@ describe('Subscription', function () {
 
       it('invalidates keys when passed invalidate option', function () {
         return (new Subscription({
-            url: '/users/23/collections/XY/items',
-            key: 'zotero-api-key'
-          }))
+          url: '/users/23/collections/XY/items',
+          key: 'zotero-api-key'
+        }))
 
           .destroy({ 'invalidate-key': true })
 

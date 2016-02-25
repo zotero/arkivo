@@ -35,9 +35,9 @@ program
       debug('sigterm received: shutting down...');
 
       B.all([
-          server.stop(),
-          controller.stop()
-        ])
+        server.stop(),
+        controller.stop()
+      ])
 
         .then(quit) // Can be removed with next Kue version
 

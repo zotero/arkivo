@@ -265,8 +265,8 @@ describe('Session', function () {
         session.execute(),
         session.execute(true)
       ]).then(function () {
-          expect(session.update).to.have.been.calledTwice;
-        });
+        expect(session.update).to.have.been.calledTwice;
+      });
     });
 
     it('downloads items unless skip option is set', function () {
@@ -276,8 +276,8 @@ describe('Session', function () {
         session.execute(),
         session.execute(true)
       ]).then(function () {
-          expect(session.download).to.have.been.calledOnce;
-        });
+        expect(session.download).to.have.been.calledOnce;
+      });
     });
 
     describe('when interrupted', function () {

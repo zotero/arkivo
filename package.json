@@ -1,6 +1,6 @@
 {
   "name": "arkivo",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Zotero Archiving Tool",
   "main": "lib/arkivo.js",
   "bin": {

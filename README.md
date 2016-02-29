@@ -9,7 +9,7 @@ them to any number of Arkivo plugins for further processing.
 
 Requirements
 ------------
-* Node.js (>= 0.10, ideally 0.12), io.js (>= 1.7)
+* Node.js (>= 0.12, ideally > 4.0)
 * Redis
 
 Quickstart

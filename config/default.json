@@ -8,8 +8,7 @@
       "timeout": 1000,          // Shutdown grace period
       "delay": 5000,            // Delay before sync on Stream API update
       "attempts": 1,            // Number of sync attempts (and retries on failure)
-      "backoff": "exponential", // Backoff type for retries
-      "promote": 5000
+      "backoff": "exponential"  // Backoff type for retries
     },
 
     "http": {

@@ -24,14 +24,10 @@ Exec['apt-get-update'] -> Package <| |>
 package { [
     'build-essential',
     'curl',
-    'git-core'
+    'git-core',
+    'redis-server'
   ]:
   ensure => latest
-}
-# --- Redis ------------------------------------------------------------------
-
-class { 'redis':
-  listen => '*'
 }
 
 # --- Node.js ----------------------------------------------------------------

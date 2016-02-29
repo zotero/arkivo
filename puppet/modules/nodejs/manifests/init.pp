@@ -1,7 +1,7 @@
 class nodejs(
   $user,
   $home        = "/home/${user}",
-  $version     = '0.11.13'
+  $version     = '4.3.1'
 ){
 
   $NODE_PATH = "${home}/.nvm/v${version}/bin"
@@ -9,7 +9,7 @@ class nodejs(
   $NPM_EXEC = "${NODE_PATH}/npm"
 
   exec { 'nvm-install-script':
-    command     => 'curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash',
+    command     => 'curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh | bash',
     cwd         => $home,
     user        => $user,
     creates     => "${home}/.nvm/nvm.sh",

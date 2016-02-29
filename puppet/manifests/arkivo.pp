@@ -38,5 +38,5 @@ class { 'redis':
 
 class { 'nodejs':
   user    => 'vagrant',
-  version => '0.12.2'
+  version => '5.7.0'
 }

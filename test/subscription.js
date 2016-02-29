@@ -166,6 +166,39 @@ describe('Subscription', function () {
     });
   });
 
+  describe('id mapping', function () {
+    var s;
+
+    beforeEach(function () {
+      s = new Subscription({ url: '/users/12345/publications' });
+      sinon.stub(db, 'hset', delayed);
+      sinon.stub(db, 'hget', delayed);
+    });
+
+    afterEach(function () {
+      db.hset.restore();
+      db.hget.restore();
+    });
+
+    describe('#lookup', function () {
+      it('prefixes the key with library and plugin', function () {
+        return s.lookup('sufia', 'ABC').then(function () {
+          expect(db.hget).to.have.been.calledWith(
+              'sufia:/users/12345/publications', 'ABC');
+        });
+      });
+    });
+
+    describe('#remember', function () {
+      it('prefixes the key with library and plugin', function () {
+        return s.remember('sufia', 'ABC', '123').then(function () {
+          expect(db.hset).to.have.been.calledWith(
+              'sufia:/users/12345/publications', 'ABC', '123');
+        });
+      });
+    });
+  });
+
   describe('.find', function () {
     describe('called without query', function () {
       beforeEach(function () {

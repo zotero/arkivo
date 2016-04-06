@@ -1,8 +1,9 @@
 language: node_js
 
 node_js:
-  - "4.1"
-  - "4.0"
+  - "5"
+  - "4"
+  - "0.12"
 
 sudo: false
 cache:
@@ -11,6 +12,10 @@ cache:
 
 matrix:
   fast_finish: true
+
+before_install:
+  # For 0.12 without harmony
+  - npm install gnode
 
 script: "make test-travis"
 after_script: "npm install coveralls@2.10.0 && cat ./coverage/lcov.info | coveralls"

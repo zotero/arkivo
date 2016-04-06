@@ -12,6 +12,10 @@ Requirements
 * Node.js (>= 0.12, ideally > 4.0)
 * Redis
 
+When using Arkivo with Node.js 0.12 you need enable the harmony flag
+for generator support, or, alternatively, `npm install gnode` and Arkivo
+will use it to transpile the generator code on the fly.
+
 Quickstart
 ----------
 Install `arkivo` using NPM:

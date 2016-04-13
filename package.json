@@ -40,7 +40,7 @@
     "kue": "~0",
     "redis": "^2.4.2",
     "tabtab": "~0",
-    "zotero": "~0.4.0"
+    "zotero": "~0.4.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

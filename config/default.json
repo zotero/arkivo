@@ -11,6 +11,11 @@
       "backoff": "exponential"  // Backoff type for retries
     },
 
+    "listener": {
+      "ping": 45000,            // The ping interval (keep-alive)
+      "pong": 20000             // The max time to wait for a pong
+    },
+
     "http": {
       "title": "Arkivo",
       "port": 8888,

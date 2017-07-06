@@ -3,6 +3,8 @@ BIN = ./node_modules/.bin
 SRC = lib/*.js lib/**/*.js
 TEST = test/*.js test/*.js test/http/*.js test/plugins/*.js
 
+export ALLOW_CONFIG_MUTATIONS = 1
+
 doc:
 	${BIN}/yuidoc .
 

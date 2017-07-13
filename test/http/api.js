@@ -57,6 +57,10 @@ describe('API', function () {
       self.id = 'id';
       return B.fulfilled(self);
     });
+
+    sinon.stub(Subscription, 'validateItemsUrl', function () {
+      return B.fulfilled(this);
+    });
   });
 
   afterEach(function () {
@@ -66,6 +70,7 @@ describe('API', function () {
     Subscription.ids.restore();
     Subscription.load.restore();
     Subscription.prototype.save.restore();
+    Subscription.validateItemsUrl.restore();
   });
 
   after(function () {
@@ -118,7 +123,7 @@ describe('API', function () {
           expect(Subscription.load).to.have.been.calledThrice;
 
           expect(res.body).to.have.length(ids.length);
-          expect(res.body[0]).to.have.keys(['id', 'url', 'key', 'version']);
+          expect(res.body[0]).to.have.keys(['id', 'url', 'key', 'version', 'timestamp']);
         });
     });
 
@@ -244,7 +249,7 @@ describe('API', function () {
               .and.to.be.json;
 
             expect(res.body).to.have.property('id', 'foo');
-            expect(res.body).to.have.keys(['id', 'url', 'key', 'version']);
+            expect(res.body).to.have.keys(['id', 'url', 'key', 'version', 'timestamp']);
           });
       });
     });

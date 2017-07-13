@@ -20,8 +20,8 @@ describe('Listener', function () {
     sinon.stub(zotero, 'stream', function () {
       var stream = new EventEmitter();
 
-      stream.subscribe = sinon.stub().yields();
-      stream.unsubscribe = sinon.stub().yields();
+      stream.subscribe = sinon.stub();
+      stream.unsubscribe = sinon.stub();
 
       return stream;
     });
@@ -46,27 +46,37 @@ describe('Listener', function () {
 
   describe('.remove', function () {
     beforeEach(function () {
-      listener.current.push({
-        id: 'foo', key: 'bar', topic: '/users/42/items'
+      listener.subscriptions.push({
+        id: 'id1', key: 'key1', topic: '/users/42'
       });
 
-      listener.current.push({
-        id: 'baz', topic: '/users/42/items'
+      listener.subscriptions.push({
+        id: 'id2', topic: '/users/42'
+      });
+
+      listener.subscriptions.push({
+        id: 'id3', topic: '/users/42'
       });
     });
 
     it('removes the subscription by id', function () {
-      expect(listener.current).to.have.length(2);
+      expect(listener.subscriptions).to.have.length(3);
 
-      return listener
-        .remove({ id: 'foo' })
-        .then(function () {
-          expect(listener.current).to.have.length(1);
+      listener.remove('id1');
+      expect(listener.subscriptions).to.have.length(2);
+      expect(listener.stream.unsubscribe).to.have.been.called;
+      expect(listener.stream.unsubscribe.args[0][0])
+            .to.have.property('apiKey', 'key1');
 
-          expect(listener.stream.unsubscribe).to.have.been.called;
-          expect(listener.stream.unsubscribe.args[0][0])
-            .to.have.property('apiKey', 'bar');
-        });
+      listener.stream.unsubscribe.reset();
+
+      listener.remove('id2');
+      expect(listener.subscriptions).to.have.length(1);
+      expect(listener.stream.unsubscribe).not.to.have.been.called;
+
+      listener.remove('id3');
+      expect(listener.subscriptions).to.have.length(0);
+      expect(listener.stream.unsubscribe).to.have.been.called;
     });
 
   });
@@ -99,36 +109,6 @@ describe('Listener', function () {
         expect(data[0])
           .to.have.property('topics')
           .and.to.contain(subscriptions[0].topic);
-      });
-
-      it('adds the subscription to pending', function () {
-        expect(listener.pending).to.be.empty;
-        listener.add(subscriptions);
-        expect(listener.pending).to.have.length(1);
-        expect(listener.current).to.be.empty;
-      });
-
-      it('resolves the promise on resolve key/topic', function () {
-        process.nextTick(function () {
-          listener.resolve(subscriptions[0].key, subscriptions[0].topic);
-          expect(listener.pending).to.be.empty;
-          expect(listener.current).to.have.length(1);
-        });
-
-        return expect(listener.add(subscriptions))
-          .eventually
-          .to.be.instanceof(Array)
-          .and.have.length(1);
-      });
-
-      it('rejects the promise on reject key/topic', function () {
-        process.nextTick(function () {
-          listener.reject(subscriptions[0].key, subscriptions[0].topic);
-          expect(listener.pending).to.be.empty;
-        });
-
-        return expect(listener.add(subscriptions))
-          .to.eventually.be.rejected;
       });
     });
 

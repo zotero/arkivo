@@ -35,6 +35,10 @@ describe('Controller', function () {
 
       sinon.stub(controller, 'notify');
 
+      sinon.stub(Subscription, 'validateItemsUrl', function () {
+        return B.fulfilled(this);
+      });
+
       controller.options.listen = false;
     });
 
@@ -43,6 +47,7 @@ describe('Controller', function () {
       Subscription.prototype.save.restore();
       Subscription.prototype.destroy.restore();
       Subscription.load.restore();
+      Subscription.validateItemsUrl.restore();
 
       controller.options.listen = true;
     });
